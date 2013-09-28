@@ -1,0 +1,8 @@
+## Interface: 50400
+## Title: DontCast
+## Notes: Warns when target is immune to casts
+## Author: Exupery
+## Version: 0.1
+
+DontCast.lua
+DontCast.xml
