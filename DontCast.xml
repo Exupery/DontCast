@@ -1,0 +1,39 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+ 	<Script File="DontCast.lua"/>
+ 	<Frame name="UnLockMe" parent="UIParent" enablekeyboard="true" clampedToScreen="true" movable="true">
+ 		<Size>
+			<AbsDimension x="300" y="150"/>
+		</Size>
+		<Scripts>
+			<OnLoad>
+				onLoad(self);
+			</OnLoad>
+			<OnEvent function="eventHandler" />
+			<OnDragStart function="dragStart" />
+			<OnDragStop function="dragStop" />
+		</Scripts>
+		<Anchors>
+			<Anchor point="CENTER">
+			</Anchor>
+		</Anchors>
+
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture setAllPoints="true">
+					<Color r="0.7" g="0.4" b="0.65" a="0" />
+				</Texture>
+				<FontString name="CountdownText" font="Fonts\SKURRI.TTF" text="DO NOT CAST">
+					<Color r="1" g="1" b="0.1" a="1" />
+					<Size x="300" y="50"/>
+					<FontHeight>
+				      	<AbsValue val="75"/>
+				    </FontHeight>
+					<Anchors>
+						<Anchor point="TOP" />
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+ 	</Frame>
+</Ui> 	
