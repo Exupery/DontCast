@@ -26,10 +26,10 @@ SlashCmdList["DONTCAST"] = function(cmd)
 	end
 end
 
-function onLoad(self)
-	if self and CountdownText then
+function onLoad(self, textFrame)
+	if self and textFrame then
 		mainFrame = self
-		mainText = CountdownText
+		cdText = textFrame
 		print("|cff9382C9".."DontCast loaded, for help type /dontcast ?")
 	else
 		print("|cffFF0000".."Error loading DontCast!")

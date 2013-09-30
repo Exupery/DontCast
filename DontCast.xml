@@ -6,7 +6,7 @@
 		</Size>
 		<Scripts>
 			<OnLoad>
-				onLoad(self);
+				onLoad(self, CountdownText)
 			</OnLoad>
 			<OnEvent function="eventHandler" />
 			<OnDragStart function="dragStart" />
