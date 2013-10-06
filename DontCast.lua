@@ -13,7 +13,7 @@ SlashCmdList["DONTCAST"] = function(cmd)
 		elseif cmd=="reset" then
 			moveToCenter(mainFrame)
 		elseif cmd=="test" then
-			print("TESTING DONTCAST");	--DELME
+			print("TESTING DONTCAST")	--DELME
 		else
 			print("|cff9382C9".."DontCast commands:")
 			print("/dontcast show - Shows the frame for repositioning")
@@ -30,9 +30,21 @@ function onLoad(self, textFrame)
 	if self and textFrame then
 		mainFrame = self
 		cdText = textFrame
+		eventFrame = CreateFrame("Frame", "eventFrame", UIParent)
+		eventFrame:RegisterEvent("UNIT_AURA")
+		eventFrame:SetScript("OnEvent", eventHandler)
 		print("|cff9382C9".."DontCast loaded, for help type /dontcast ?")
 	else
 		print("|cffFF0000".."Error loading DontCast!")
+	end
+end
+
+function eventHandler(self, event, unit, ...)
+	if unit=="target" then
+		if event=="UNIT_AURA" then
+			print(event) --DELME
+			print(unit) --DELME
+		end
 	end
 end
 
