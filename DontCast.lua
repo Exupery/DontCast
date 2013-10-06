@@ -2,9 +2,10 @@ SLASH_DONTCAST1 = "/dontcast"
 
 local mainFrame = nil
 local textFrame = nil
+local iconFrame = nil
 
 SlashCmdList["DONTCAST"] = function(cmd)
-	if mainFrame and textFrame then
+	if mainFrame and textFrame and iconFrame then
 		if cmd=="show" then
 			print("|cff9382C9".."Right click and drag to move, when done type /dontcast hide")
 			showAndUnlockFrame(mainFrame, textFrame)
@@ -26,13 +27,15 @@ SlashCmdList["DONTCAST"] = function(cmd)
 	end
 end
 
-function onLoad(self, text)
-	if self and text then
+function onLoad(self, text, icon)
+	if self and text and icon then
 		mainFrame = self
 		textFrame = text
+		iconFrame = icon
 		eventFrame = CreateFrame("Frame", "eventFrame", UIParent)
 		eventFrame:RegisterEvent("UNIT_AURA")
 		eventFrame:SetScript("OnEvent", eventHandler)
+		hideAndLockFrame(mainFrame)
 		print("|cff9382C9".."DontCast loaded, for help type /dontcast ?")
 	else
 		print("|cffFF0000".."Error loading DontCast!")
@@ -44,6 +47,7 @@ function eventHandler(self, event, unit, ...)
 		local name, rank, icon, count, type, dur, expTime = UnitAura("target", "Unending Breath")
 		print(name, icon, expTime - GetTime()) --DELME
 		textFrame:SetText(name)
+		iconFrame:SetTexture(icon)
 		showFrame(mainFrame)
 	end
 end
@@ -58,6 +62,7 @@ end
 
 function showAndUnlockFrame(frame, text)
 	text:SetText("Right click here to move")
+	iconFrame:SetTexture("Interface\\ICONS\\INV_Misc_QuestionMark")
 	showFrame(frame)
 	frame:EnableMouse(true)
 	frame:RegisterForDrag("RightButton")
