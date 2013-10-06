@@ -1,13 +1,13 @@
 SLASH_DONTCAST1 = "/dontcast"
 
 local mainFrame = nil
-local cdText = nil
+local textFrame = nil
 
 SlashCmdList["DONTCAST"] = function(cmd)
-	if mainFrame and cdText then
+	if mainFrame and textFrame then
 		if cmd=="show" then
 			print("|cff9382C9".."Right click and drag to move, when done type /dontcast hide")
-			showAndUnlockFrame(mainFrame, cdText)
+			showAndUnlockFrame(mainFrame, textFrame)
 		elseif cmd=="hide" then
 			hideAndLockFrame(mainFrame)
 		elseif cmd=="reset" then
@@ -26,10 +26,10 @@ SlashCmdList["DONTCAST"] = function(cmd)
 	end
 end
 
-function onLoad(self, textFrame)
-	if self and textFrame then
+function onLoad(self, text)
+	if self and text then
 		mainFrame = self
-		cdText = textFrame
+		textFrame = text
 		eventFrame = CreateFrame("Frame", "eventFrame", UIParent)
 		eventFrame:RegisterEvent("UNIT_AURA")
 		eventFrame:SetScript("OnEvent", eventHandler)
@@ -40,11 +40,11 @@ function onLoad(self, textFrame)
 end
 
 function eventHandler(self, event, unit, ...)
-	if unit=="target" then
-		if event=="UNIT_AURA" then
-			print(event) --DELME
-			print(unit) --DELME
-		end
+	if unit=="target" and event=="UNIT_AURA" then
+		local name, rank, icon, count, type, dur, expTime = UnitAura("target", "Unending Breath")
+		print(name, icon, expTime - GetTime()) --DELME
+		textFrame:SetText(name)
+		showFrame(mainFrame)
 	end
 end
 
