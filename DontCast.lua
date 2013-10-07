@@ -44,11 +44,21 @@ end
 
 function eventHandler(self, event, unit, ...)
 	if unit=="target" and event=="UNIT_AURA" then
-		local name, rank, icon, count, type, dur, expTime = UnitAura("target", "Unending Breath")
-		print(name, icon, expTime - GetTime()) --DELME
-		textFrame:SetText(name)
-		iconFrame:SetTexture(icon)
-		showFrame(mainFrame)
+		local hasAura = false
+		local auras = {"Twilight Ward"}
+		for _, aura in pairs(auras) do
+			local name, rank, icon, count, type, dur, expTime = UnitAura("target", aura)
+			if aura then
+				--print(name, icon, expTime - GetTime()) --DELME
+				textFrame:SetText(name)
+				iconFrame:SetTexture(icon)
+				showFrame(mainFrame)
+				hasAura = true
+			end
+		end
+		if not hasAura then
+			hideFrame(mainFrame)
+		end
 	end
 end
 
