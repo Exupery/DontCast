@@ -44,7 +44,16 @@ end
 function eventHandler(self, event, unit, ...)
 	local hasAura = false
 	if unit=="target" then
-		local auras = {"Twilight Ward"}
+		local auras = {
+			"Anti-Magic Shell",
+			"Cloak of Shadows",
+			"Cyclone",
+			"Deterrence",
+			"Divine Shield",
+			"Ice Block",
+			"Smoke Bomb",
+			"Spell Reflection"
+		}
 		for _, aura in pairs(auras) do
 			local name, rank, icon, count, type, dur, expTime = UnitAura("target", aura)
 			if name then

@@ -2,7 +2,7 @@
 ## Title: DontCast
 ## Notes: Warns when target is immune to casts
 ## Author: Exupery
-## Version: 0.1
+## Version: 1.0
 
 DontCast.lua
 DontCast.xml
