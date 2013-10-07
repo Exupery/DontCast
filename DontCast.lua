@@ -13,8 +13,6 @@ SlashCmdList["DONTCAST"] = function(cmd)
 			hideAndLockFrame(mainFrame)
 		elseif cmd=="reset" then
 			moveToCenter(mainFrame)
-		elseif cmd=="test" then
-			print("TESTING DONTCAST")	--DELME
 		else
 			print("|cff9382C9".."DontCast commands:")
 			print("/dontcast show - Shows the frame for repositioning")
@@ -34,6 +32,7 @@ function onLoad(self, text, icon)
 		iconFrame = icon
 		eventFrame = CreateFrame("Frame", "eventFrame", UIParent)
 		eventFrame:RegisterEvent("UNIT_AURA")
+		eventFrame:RegisterEvent("UNIT_TARGET")
 		eventFrame:SetScript("OnEvent", eventHandler)
 		hideAndLockFrame(mainFrame)
 		print("|cff9382C9".."DontCast loaded, for help type /dontcast ?")
@@ -43,12 +42,13 @@ function onLoad(self, text, icon)
 end
 
 function eventHandler(self, event, unit, ...)
-	if unit=="target" and event=="UNIT_AURA" then
-		local hasAura = false
+	local hasAura = false
+	if unit=="target" then
 		local auras = {"Twilight Ward"}
 		for _, aura in pairs(auras) do
 			local name, rank, icon, count, type, dur, expTime = UnitAura("target", aura)
-			if aura then
+			if name then
+				--TODO display time remaining
 				--print(name, icon, expTime - GetTime()) --DELME
 				textFrame:SetText(name)
 				iconFrame:SetTexture(icon)
@@ -56,9 +56,9 @@ function eventHandler(self, event, unit, ...)
 				hasAura = true
 			end
 		end
-		if not hasAura then
-			hideFrame(mainFrame)
-		end
+	end
+	if not hasAura then
+		hideFrame(mainFrame)
 	end
 end
 
