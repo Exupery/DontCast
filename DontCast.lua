@@ -42,8 +42,8 @@ function onLoad(self, text, icon)
 end
 
 function eventHandler(self, event, unit, ...)
-	local hasAura = false
 	if unit=="target" then
+		local hasAura = false
 		local auras = {
 			"Anti-Magic Shell",
 			"Cloak of Shadows",
@@ -65,9 +65,9 @@ function eventHandler(self, event, unit, ...)
 				hasAura = true
 			end
 		end
-	end
-	if not hasAura then
-		hideFrame(mainFrame)
+		if not hasAura then
+			hideFrame(mainFrame)
+		end
 	end
 end
 
