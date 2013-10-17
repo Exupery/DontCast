@@ -21,4 +21,4 @@ Warns a caster when their current target has buffs or debuffs that would greatly
 ## TODOs
 * display time remaining as a countdown
 * customizable text color
-* trigger only when target is an enemy
+* customizable buff/debuff list

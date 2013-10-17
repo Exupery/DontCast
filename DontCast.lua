@@ -32,7 +32,7 @@ function onLoad(self, text, icon)
 		iconFrame = icon
 		eventFrame = CreateFrame("Frame", "eventFrame", UIParent)
 		eventFrame:RegisterEvent("UNIT_AURA")
-		eventFrame:RegisterEvent("UNIT_TARGET")
+		eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
 		eventFrame:SetScript("OnEvent", eventHandler)
 		hideAndLockFrame(mainFrame)
 		print("|cff9382C9".."DontCast loaded, for help type /dontcast ?")
@@ -42,8 +42,8 @@ function onLoad(self, text, icon)
 end
 
 function eventHandler(self, event, unit, ...)
-	if unit=="target" then
-		local hasAura = false
+	local hasAura = false
+	if UnitIsEnemy("player", "target") then
 		local auras = {
 			"Anti-Magic Shell",
 			"Cloak of Shadows",
@@ -65,9 +65,9 @@ function eventHandler(self, event, unit, ...)
 				hasAura = true
 			end
 		end
-		if not hasAura then
-			hideFrame(mainFrame)
-		end
+	end
+	if not hasAura then
+		hideFrame(mainFrame)
 	end
 end
 
