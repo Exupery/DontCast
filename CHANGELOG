@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.0.2
+- fixed bug causing premature clearing of some warnings
+
 v1.0.1
 - warning triggers only when player's current target is an enemy
 - warning clears if player dies while warning is active

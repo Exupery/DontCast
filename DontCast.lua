@@ -30,10 +30,12 @@ function onLoad(self, text, icon)
 		mainFrame = self
 		textFrame = text
 		iconFrame = icon
-		eventFrame = CreateFrame("Frame", "eventFrame", UIParent)
-		eventFrame:RegisterEvent("UNIT_AURA")
-		eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
-		eventFrame:SetScript("OnEvent", eventHandler)
+		local targetEventFrame = CreateFrame("Frame", "targetEventFrame", UIParent)
+		targetEventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
+		targetEventFrame:SetScript("OnEvent", targetChanged)
+		local auraEventFrame = CreateFrame("Frame", "auraEventFrame", UIParent)
+		auraEventFrame:RegisterEvent("UNIT_AURA")
+		auraEventFrame:SetScript("OnEvent", auraUpdated)
 		hideAndLockFrame(mainFrame)
 		print("|cff9382C9".."DontCast loaded, for help type /dontcast ?")
 	else
@@ -41,9 +43,21 @@ function onLoad(self, text, icon)
 	end
 end
 
-function eventHandler(self, event, unit, ...)
-	local hasAura = false
-	if UnitIsEnemy("player", "target") then
+function targetIsHostile()
+	return UnitIsEnemy("player", "target") or UnitCanAttack("player", "target")
+end
+
+function targetChanged(self, event, unit, ...)
+	if targetIsHostile() then
+		auraUpdated(self, event, "target")
+	else
+		hideFrame(mainFrame)
+	end
+end
+
+function auraUpdated(self, event, unit, ...)
+	if unit == "target" and targetIsHostile() then
+		local hasAura = false
 		local auras = {
 			"Anti-Magic Shell",
 			"Cloak of Shadows",
@@ -55,7 +69,7 @@ function eventHandler(self, event, unit, ...)
 			"Spell Reflection"
 		}
 		for _, aura in pairs(auras) do
-			local name, rank, icon, count, type, dur, expTime = UnitAura("target", aura)
+			local name, rank, icon, count, type, dur, expTime = UnitAura(unit, aura)
 			if name then
 				--TODO display time remaining
 				--print(name, icon, expTime - GetTime()) --DELME
@@ -65,9 +79,9 @@ function eventHandler(self, event, unit, ...)
 				hasAura = true
 			end
 		end
-	end
-	if not hasAura then
-		hideFrame(mainFrame)
+		if not hasAura then
+			hideFrame(mainFrame)
+		end
 	end
 end
 
