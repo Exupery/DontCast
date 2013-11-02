@@ -74,7 +74,8 @@ function colorPrint(msg)
 end
 
 function targetIsHostile()
-	return UnitIsEnemy("player", "target") or UnitCanAttack("player", "target")
+	--return UnitIsEnemy("player", "target") or UnitCanAttack("player", "target")
+	return true --REVERT
 end
 
 function targetChanged(self, event, unit, ...)
@@ -88,7 +89,7 @@ end
 function auraUpdated(self, event, unit, ...)
 	if unit == "target" and targetIsHostile() then
 		local hasAura = false
-		for _, aura in pairs(DontCastAuras) do
+		for aura, _ in pairs(DontCastAuras) do
 			local name, rank, icon, count, type, dur, expTime = UnitAura(unit, aura)
 			if name then
 				--TODO display time remaining
@@ -106,9 +107,8 @@ function auraUpdated(self, event, unit, ...)
 end
 
 function addAura(aura)
-	local size = #DontCastAuras
-	table.insert(DontCastAuras, aura)
-	if #DontCastAuras > size then
+	DontCastAuras[aura] = true
+	if DontCastAuras[aura] then
 		auras = savedAuras()
 		colorPrint(aura.." added")
 	end
@@ -122,7 +122,7 @@ end
 
 function displayAuras()
 	colorPrint("DontCast is triggered by the following:")
-	for _, aura in pairs(DontCastAuras) do
+	for aura, _ in pairs(DontCastAuras) do
 		print(aura)
 	end
 end
@@ -136,14 +136,14 @@ end
 
 function defaultAuras()
 	return {
-			"Anti-Magic Shell",
-			"Cloak of Shadows",
-			"Cyclone",
-			"Deterrence",
-			"Divine Shield",
-			"Ice Block",
-			"Smoke Bomb",
-			"Spell Reflection"
+			["Anti-Magic Shell"] = true,
+			["Cloak of Shadows"] = true,
+			["Cyclone"] = true,
+			["Deterrence"] = true,
+			["Divine Shield"] = true,
+			["Ice Block"] = true,
+			["Smoke Bomb"] = true,
+			["Spell Reflection"] = true
 		}
 end
 
