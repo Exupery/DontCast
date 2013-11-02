@@ -8,7 +8,7 @@ local auras = {}
 SlashCmdList["DONTCAST"] = function(cmd)
 	if mainFrame and textFrame and iconFrame then
 		if cmd=="show" then
-			print("|cff9382C9".."Right click and drag to move, when done type /dontcast hide")
+			colorPrint("Right click and drag to move, when done type /dontcast hide")
 			showAndUnlockFrame(mainFrame, textFrame)
 		elseif cmd=="hide" then
 			hideAndLockFrame(mainFrame)
@@ -25,13 +25,13 @@ SlashCmdList["DONTCAST"] = function(cmd)
 			displayAuras()
 		elseif cmd=="default" then
 			DontCastAuras = defaultAuras()
-			print("|cff9382C9".."DontCast reverted to default auras")			
+			colorPrint("DontCast reverted to default triggers")			
 		else
-			print("|cff9382C9".."DontCast commands:")
-			print("/dontcast add NAME - adds the named aura")
-			print("/dontcast remove NAME - removes the named aura")
-			print("/dontcast list - display which auras will trigger the warning")
-			print("/dontcast default - reverts to the default auras")
+			colorPrint("DontCast commands:")
+			print("/dontcast add NAME - adds the named buff or debuff")
+			print("/dontcast remove NAME - removes the named buff or debuff")
+			print("/dontcast list - display what will trigger the warning")
+			print("/dontcast default - reverts to the default triggers")
 			print("/dontcast show - Shows the frame for repositioning")
 			print("/dontcast hide - Locks (and hides) the frame")
 			print("/dontcast reset - Resets the position to center of screen")
@@ -53,7 +53,7 @@ function onLoad(self, text, icon)
 		eventFrame:RegisterEvent("UNIT_AURA")
 		eventFrame:SetScript("OnEvent", eventHandler)
 		hideAndLockFrame(mainFrame)
-		print("|cff9382C9".."DontCast loaded, for help type /dontcast ?")
+		colorPrint("DontCast loaded, for help type /dontcast ?")
 	else
 		print("|cffFF0000".."Unable to load DontCast!")
 	end
@@ -121,7 +121,7 @@ function removeAura(aura)
 end
 
 function displayAuras()
-	print("|cff9382C9".."DontCast is triggered by the following:")
+	colorPrint("DontCast is triggered by the following:")
 	for _, aura in pairs(DontCastAuras) do
 		print(aura)
 	end
