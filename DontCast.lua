@@ -3,6 +3,7 @@ SLASH_DONTCAST1 = "/dontcast"
 local mainFrame = nil
 local textFrame = nil
 local iconFrame = nil
+local auras = {}
 
 SlashCmdList["DONTCAST"] = function(cmd)
 	if mainFrame and textFrame and iconFrame then
@@ -30,17 +31,42 @@ function onLoad(self, text, icon)
 		mainFrame = self
 		textFrame = text
 		iconFrame = icon
-		local targetEventFrame = CreateFrame("Frame", "targetEventFrame", UIParent)
-		targetEventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
-		targetEventFrame:SetScript("OnEvent", targetChanged)
-		local auraEventFrame = CreateFrame("Frame", "auraEventFrame", UIParent)
-		auraEventFrame:RegisterEvent("UNIT_AURA")
-		auraEventFrame:SetScript("OnEvent", auraUpdated)
+		local eventFrame = CreateFrame("Frame", "eventFrame", UIParent)
+		eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
+		eventFrame:RegisterEvent("ADDON_LOADED")
+		eventFrame:RegisterEvent("UNIT_AURA")
+		eventFrame:SetScript("OnEvent", eventHandler)
 		hideAndLockFrame(mainFrame)
 		print("|cff9382C9".."DontCast loaded, for help type /dontcast ?")
 	else
-		print("|cffFF0000".."Error loading DontCast!")
+		print("|cffFF0000".."Unable to load DontCast!")
 	end
+end
+
+function eventHandler(self, event, unit, ...)
+	if event == "UNIT_AURA" then
+		auraUpdated(self, event, unit)
+	elseif event == "PLAYER_TARGET_CHANGED" then
+		targetChanged(self, event, unit)		
+	elseif event == "ADDON_LOADED" and unit == "DontCast" then
+		auras = getAuras()		
+	end
+end
+
+function getAuras()
+	if not DontCastAuras then
+		DontCastAuras = {
+			"Anti-Magic Shell",
+			"Cloak of Shadows",
+			"Cyclone",
+			"Deterrence",
+			"Divine Shield",
+			"Ice Block",
+			"Smoke Bomb",
+			"Spell Reflection"
+		}
+	end
+	return DontCastAuras
 end
 
 function targetIsHostile()
@@ -56,19 +82,11 @@ function targetChanged(self, event, unit, ...)
 end
 
 function auraUpdated(self, event, unit, ...)
-	if unit == "target" and targetIsHostile() then
+	--if unit == "target" and targetIsHostile() then
+	if unit == "target" then
 		local hasAura = false
-		local auras = {
-			"Anti-Magic Shell",
-			"Cloak of Shadows",
-			"Cyclone",
-			"Deterrence",
-			"Divine Shield",
-			"Ice Block",
-			"Smoke Bomb",
-			"Spell Reflection"
-		}
-		for _, aura in pairs(auras) do
+		for _, aura in pairs(DontCastAuras) do
+			print(aura) --DELME
 			local name, rank, icon, count, type, dur, expTime = UnitAura(unit, aura)
 			if name then
 				--TODO display time remaining
