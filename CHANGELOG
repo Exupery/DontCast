@@ -2,7 +2,9 @@ DONTCAST CHANGE LOG
 ===================
 
 v1.0.3
-- added commands for player to customize buffs/debuffs
+- added commands for player to add and remove buffs/debuffs
+- added command to display current triggers
+- added command to reset to default triggers
 
 v1.0.2
 - fixed bug causing premature clearing of some warnings

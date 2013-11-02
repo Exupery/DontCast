@@ -14,8 +14,24 @@ SlashCmdList["DONTCAST"] = function(cmd)
 			hideAndLockFrame(mainFrame)
 		elseif cmd=="reset" then
 			moveToCenter(mainFrame)
+		elseif string.match(cmd, "add%s+%w+") then
+			local aura = string.match(cmd, "add%s+(.+)")
+			if aura then
+				addAura(aura)
+			end
+		elseif cmd=="remove" then
+			print("REMOVE")	--DELME
+		elseif cmd=="list" then
+			displayAuras()
+		elseif cmd=="default" then
+			DontCastAuras = defaultAuras()
+			print("|cff9382C9".."DontCast reverted to default auras")			
 		else
 			print("|cff9382C9".."DontCast commands:")
+			print("/dontcast add NAME - adds the named aura")
+			print("/dontcast remove NAME - removes the named aura")
+			print("/dontcast list - display which auras will trigger the warning")
+			print("/dontcast default - reverts to the default auras")
 			print("/dontcast show - Shows the frame for repositioning")
 			print("/dontcast hide - Locks (and hides) the frame")
 			print("/dontcast reset - Resets the position to center of screen")
@@ -49,24 +65,12 @@ function eventHandler(self, event, unit, ...)
 	elseif event == "PLAYER_TARGET_CHANGED" then
 		targetChanged(self, event, unit)		
 	elseif event == "ADDON_LOADED" and unit == "DontCast" then
-		auras = getAuras()		
+		auras = savedAuras()		
 	end
 end
 
-function getAuras()
-	if not DontCastAuras then
-		DontCastAuras = {
-			"Anti-Magic Shell",
-			"Cloak of Shadows",
-			"Cyclone",
-			"Deterrence",
-			"Divine Shield",
-			"Ice Block",
-			"Smoke Bomb",
-			"Spell Reflection"
-		}
-	end
-	return DontCastAuras
+function colorPrint(msg)
+	print("|cff9382C9"..msg)
 end
 
 function targetIsHostile()
@@ -82,11 +86,9 @@ function targetChanged(self, event, unit, ...)
 end
 
 function auraUpdated(self, event, unit, ...)
-	--if unit == "target" and targetIsHostile() then
-	if unit == "target" then
+	if unit == "target" and targetIsHostile() then
 		local hasAura = false
 		for _, aura in pairs(DontCastAuras) do
-			print(aura) --DELME
 			local name, rank, icon, count, type, dur, expTime = UnitAura(unit, aura)
 			if name then
 				--TODO display time remaining
@@ -101,6 +103,48 @@ function auraUpdated(self, event, unit, ...)
 			hideFrame(mainFrame)
 		end
 	end
+end
+
+function addAura(aura)
+	local size = #DontCastAuras
+	table.insert(DontCastAuras, aura)
+	if #DontCastAuras > size then
+		auras = savedAuras()
+		colorPrint(aura.." added")
+	end
+end
+
+function removeAura(aura)
+	--TODO remove
+	print("REMOVING: ", aura)	--DELME
+	auras = savedAuras()
+end
+
+function displayAuras()
+	print("|cff9382C9".."DontCast is triggered by the following:")
+	for _, aura in pairs(DontCastAuras) do
+		print(aura)
+	end
+end
+
+function savedAuras()
+	if not DontCastAuras then
+		DontCastAuras = defaultAuras()
+	end
+	return DontCastAuras
+end
+
+function defaultAuras()
+	return {
+			"Anti-Magic Shell",
+			"Cloak of Shadows",
+			"Cyclone",
+			"Deterrence",
+			"Divine Shield",
+			"Ice Block",
+			"Smoke Bomb",
+			"Spell Reflection"
+		}
 end
 
 function showFrame(frame)
