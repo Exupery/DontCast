@@ -19,8 +19,11 @@ SlashCmdList["DONTCAST"] = function(cmd)
 			if aura then
 				addAura(aura)
 			end
-		elseif cmd=="remove" then
-			print("REMOVE")	--DELME
+		elseif string.match(cmd, "remove%s+%w+") then
+			local aura = string.match(cmd, "remove%s+(.+)")
+			if aura then
+				removeAura(aura)
+			end
 		elseif cmd=="list" then
 			displayAuras()
 		elseif cmd=="default" then
@@ -38,7 +41,7 @@ SlashCmdList["DONTCAST"] = function(cmd)
 			print("/dontcast ? or /dontcast help - Prints this list")
 		end
 	else
-		print("|cffFF0000".."Error loading DontCast!")
+		errorPrint("Error loading DontCast!")
 	end
 end
 
@@ -47,15 +50,17 @@ function onLoad(self, text, icon)
 		mainFrame = self
 		textFrame = text
 		iconFrame = icon
+
 		local eventFrame = CreateFrame("Frame", "eventFrame", UIParent)
 		eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
 		eventFrame:RegisterEvent("ADDON_LOADED")
 		eventFrame:RegisterEvent("UNIT_AURA")
 		eventFrame:SetScript("OnEvent", eventHandler)
+
 		hideAndLockFrame(mainFrame)
 		colorPrint("DontCast loaded, for help type /dontcast ?")
 	else
-		print("|cffFF0000".."Unable to load DontCast!")
+		errorPrint("Unable to load DontCast!")
 	end
 end
 
@@ -73,9 +78,12 @@ function colorPrint(msg)
 	print("|cff9382C9"..msg)
 end
 
+function errorPrint(err)
+	print("|cffFF0000"..err)
+end
+
 function targetIsHostile()
-	--return UnitIsEnemy("player", "target") or UnitCanAttack("player", "target")
-	return true --REVERT
+	return UnitIsEnemy("player", "target") or UnitCanAttack("player", "target")
 end
 
 function targetChanged(self, event, unit, ...)
@@ -110,14 +118,20 @@ function addAura(aura)
 	DontCastAuras[aura] = true
 	if DontCastAuras[aura] then
 		auras = savedAuras()
-		colorPrint(aura.." added")
+		colorPrint("Added "..aura)
+	else
+		errorPrint("Unable to add "..aura)
 	end
 end
 
 function removeAura(aura)
-	--TODO remove
-	print("REMOVING: ", aura)	--DELME
-	auras = savedAuras()
+	DontCastAuras[aura] = nil
+	if DontCastAuras[aura] == nil then
+		auras = savedAuras()
+		colorPrint("Removed "..aura)
+	else
+		errorPrint("Unable to remove "..aura)
+	end
 end
 
 function displayAuras()
