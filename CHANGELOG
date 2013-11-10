@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.0.4
+- fixed bug preventing debuffs triggering warning
+
 v1.0.3
 - added commands for player to add and remove buffs/debuffs
 - added command to display current triggers

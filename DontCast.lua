@@ -98,7 +98,10 @@ function auraUpdated(self, event, unit, ...)
 	if unit == "target" and targetIsHostile() then
 		local hasAura = false
 		for aura, _ in pairs(DontCastAuras) do
-			local name, rank, icon, count, type, dur, expTime = UnitAura(unit, aura)
+			local name, rank, icon, count, type, dur, expTime = UnitBuff(unit, aura)
+			if not name then
+				name, rank, icon, count, type, dur, expTime = UnitDebuff(unit, aura)
+			end
 			if name then
 				--TODO display time remaining
 				--print(name, icon, expTime - GetTime()) --DELME
