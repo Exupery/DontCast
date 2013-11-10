@@ -101,8 +101,17 @@ end
 
 function onUpdate(self, elapsed)
 	updCtr = updCtr + elapsed
-	if (updCtr > 2) then
-		--TODO display time remaining
+	if updCtr > 0.1 and mainFrame:IsShown() then
+		local aura = textFrame:GetText()
+		if aura then
+			local _, _, _, _, _, _, expTime = UnitBuff("target", aura)
+			if not expTime then
+				_, _, _, _, _, _, expTime = UnitDebuff("target", aura)
+			end
+			if expTime then
+				displayCountdown(expTime - GetTime())
+			end
+		end
 		updCtr = 0
 	end
 end
@@ -116,11 +125,8 @@ function auraUpdated(self, event, unit, ...)
 				name, rank, icon, count, type, dur, expTime = UnitDebuff(unit, aura)
 			end
 			if name then
-				--TODO display time remaining
-				--print(name, icon, formatTime(expTime - GetTime())) --DELME
 				textFrame:SetText(name)
 				iconFrame:SetTexture(icon)
-				displayCountdown(expTime - GetTime())
 				showFrame(mainFrame)
 				hasAura = true
 			end
@@ -132,13 +138,15 @@ function auraUpdated(self, event, unit, ...)
 end
 
 function displayCountdown(duration)
-	cdTextFrame:SetText(formatTime(duration))
+	if duration then
+		cdTextFrame:SetText(formatTime(duration))
+	end
 end
 
 function formatTime(remaining)
-	if (remaining < 3) then
+	if remaining < 3 then
 		return string.format("%.1f", remaining)
-	elseif (remaining >= 3 and remaining < 100) then
+	elseif remaining >= 3 and remaining < 100 then
 		return string.format("%.0f", remaining)
 	else
 		return string.format("%.0f", remaining / 60).."m"

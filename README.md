@@ -1,6 +1,6 @@
 # DontCast
 ### World of Warcraft caster PvP addon
-Warns a caster when their current target has buffs or debuffs that would greatly reduce or eliminate the affect of casting any spells. Buffs and debuffs can be added and removed with the appropriate slash commands.
+Warns a caster when their current target has buffs or debuffs that would greatly reduce or eliminate the affect of casting spells. Displays the name and icon of the buff/debuff, as well as a timer displaying a countdown of time remaining until the effect expires. Buffs and debuffs can be added and removed with the appropriate slash commands.
 
 ## Default Buffs/Debuffs
 * Anti-Magic Shell
@@ -23,5 +23,5 @@ Warns a caster when their current target has buffs or debuffs that would greatly
 * /dontcast ? or /dontcast help - Prints the command list
 
 ## TODOs
-* display time remaining as a countdown
-* customizable text color
+* customizable text colors
+* change color of countdown text when drops below designated threshold

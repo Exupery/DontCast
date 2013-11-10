@@ -24,6 +24,10 @@
 				<FontString name="SpellText" font="Fonts\SKURRI.TTF" justifyH="LEFT" text="">
 					<Color r="1" g="1" b="0.1" a="0.9" />
 					<Size x="300" y="50"/>
+					<Shadow>
+          				<Color r="0.1" g="0.1" b="0.1" a="0.9"/>
+          				<Offset x="2" y="-2"/>
+        			</Shadow>
 					<FontHeight>
 				      	<AbsValue val="75"/>
 				    </FontHeight>
@@ -44,8 +48,12 @@
 					</Anchors>
 				</Texture>
 				<FontString name="CountdownText" font="Fonts\SKURRI.TTF" justifyH="CENTER" text="">
-					<Color r="1" g="1" b="1" a="0.85" />
+					<Color r="1" g="1" b=".1" a="0.85" />
 					<Size x="45" y="45"/>
+					<Shadow>
+          				<Color r="0.1" g="0.1" b="0.1" a="0.9"/>
+          				<Offset x="2" y="-2"/>
+        			</Shadow>
 					<FontHeight>
 				      	<AbsValue val="40"/>
 				    </FontHeight>
