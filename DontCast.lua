@@ -3,7 +3,9 @@ SLASH_DONTCAST1 = "/dontcast"
 local mainFrame = nil
 local textFrame = nil
 local iconFrame = nil
+local cdTextFrame = nil
 local auras = {}
+local updCtr = 0
 
 SlashCmdList["DONTCAST"] = function(cmd)
 	if mainFrame and textFrame and iconFrame then
@@ -45,17 +47,20 @@ SlashCmdList["DONTCAST"] = function(cmd)
 	end
 end
 
-function onLoad(self, text, icon)
-	if self and text and icon then
+function onLoad(self, text, icon, cdText)
+	if self and text and icon and cdText then
 		mainFrame = self
 		textFrame = text
 		iconFrame = icon
+		cdTextFrame = cdText
 
 		local eventFrame = CreateFrame("Frame", "eventFrame", UIParent)
 		eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
 		eventFrame:RegisterEvent("ADDON_LOADED")
 		eventFrame:RegisterEvent("UNIT_AURA")
 		eventFrame:SetScript("OnEvent", eventHandler)
+		local countdownEventFrame = CreateFrame("Frame", "cdEventFrame", UIParent)
+		eventFrame:SetScript("OnUpdate", onUpdate)
 
 		hideAndLockFrame(mainFrame)
 		colorPrint("DontCast loaded, for help type /dontcast ?")
@@ -94,6 +99,14 @@ function targetChanged(self, event, unit, ...)
 	end
 end
 
+function onUpdate(self, elapsed)
+	updCtr = updCtr + elapsed
+	if (updCtr > 2) then
+		--TODO display time remaining
+		updCtr = 0
+	end
+end
+
 function auraUpdated(self, event, unit, ...)
 	if unit == "target" and targetIsHostile() then
 		local hasAura = false
@@ -104,9 +117,10 @@ function auraUpdated(self, event, unit, ...)
 			end
 			if name then
 				--TODO display time remaining
-				--print(name, icon, expTime - GetTime()) --DELME
+				--print(name, icon, formatTime(expTime - GetTime())) --DELME
 				textFrame:SetText(name)
 				iconFrame:SetTexture(icon)
+				displayCountdown(expTime - GetTime())
 				showFrame(mainFrame)
 				hasAura = true
 			end
@@ -114,6 +128,20 @@ function auraUpdated(self, event, unit, ...)
 		if not hasAura then
 			hideFrame(mainFrame)
 		end
+	end
+end
+
+function displayCountdown(duration)
+	cdTextFrame:SetText(formatTime(duration))
+end
+
+function formatTime(remaining)
+	if (remaining < 3) then
+		return string.format("%.1f", remaining)
+	elseif (remaining >= 3 and remaining < 100) then
+		return string.format("%.0f", remaining)
+	else
+		return string.format("%.0f", remaining / 60).."m"
 	end
 end
 

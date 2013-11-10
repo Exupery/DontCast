@@ -6,7 +6,7 @@
 		</Size>
 		<Scripts>
 			<OnLoad>
-				onLoad(self, SpellText, SpellIcon)
+				onLoad(self, SpellText, SpellIcon, CountdownText)
 			</OnLoad>
 			<OnDragStart function="dragStart" />
 			<OnDragStop function="dragStop" />
@@ -22,7 +22,7 @@
 					<Color r="0.7" g="0.4" b="0.65" a="0" />
 				</Texture>
 				<FontString name="SpellText" font="Fonts\SKURRI.TTF" justifyH="LEFT" text="">
-					<Color r="1" g="1" b="0.1" a="1" />
+					<Color r="1" g="1" b="0.1" a="0.9" />
 					<Size x="300" y="50"/>
 					<FontHeight>
 				      	<AbsValue val="75"/>
@@ -43,6 +43,18 @@
 						</Anchor>
 					</Anchors>
 				</Texture>
+				<FontString name="CountdownText" font="Fonts\SKURRI.TTF" justifyH="CENTER" text="">
+					<Color r="1" g="1" b="1" a="0.85" />
+					<Size x="45" y="45"/>
+					<FontHeight>
+				      	<AbsValue val="40"/>
+				    </FontHeight>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset x="0" y="0" />
+						</Anchor>
+					</Anchors>
+				</FontString>
 			</Layer>
 		</Layers>
 
