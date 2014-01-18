@@ -139,6 +139,11 @@ end
 
 function displayCountdown(duration)
 	if duration then
+		if duration < 1.5 then
+			cdTextFrame:SetTextColor(1, 0.1, 0.1, 1)
+		else
+			cdTextFrame:SetTextColor(1, 1, 0.1, 0.85)
+		end
 		cdTextFrame:SetText(formatTime(duration))
 	end
 end

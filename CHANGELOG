@@ -3,6 +3,7 @@ DONTCAST CHANGE LOG
 
 v1.1.1
 - added Touch of Karma and Diffuse Magic to default buff list
+- cooldown text color in red when less than 1.5 seconds remaining
 
 v1.1
 - added text counting down time remaining

@@ -25,6 +25,6 @@ Warns a caster when their current target has buffs or debuffs that would greatly
 * /dontcast ? or /dontcast help - Prints the command list
 
 ## TODOs
-* customizable text colors
 * integrate with options UI
-* change color of countdown text when drops below designated threshold
+* customizable text colors
+* customizable threshold for changing color of countdown text
