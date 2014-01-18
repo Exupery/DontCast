@@ -196,6 +196,8 @@ function defaultAuras()
 			["Divine Shield"] = true,
 			["Ice Block"] = true,
 			["Smoke Bomb"] = true,
+			["Diffuse Magic"] = true,
+			["Touch of Karma"] = true,
 			["Spell Reflection"] = true
 		}
 end

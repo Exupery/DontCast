@@ -10,6 +10,8 @@ Warns a caster when their current target has buffs or debuffs that would greatly
 * Divine Shield
 * Ice Block
 * Smoke Bomb
+* Diffuse Magic
+* Touch of Karma
 * Spell Reflection
 
 ## Commands
@@ -24,4 +26,5 @@ Warns a caster when their current target has buffs or debuffs that would greatly
 
 ## TODOs
 * customizable text colors
+* integrate with options UI
 * change color of countdown text when drops below designated threshold

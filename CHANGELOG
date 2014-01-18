@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.1.1
+- added Touch of Karma and Diffuse Magic to default buff list
+
 v1.1
 - added text counting down time remaining
 - fixed bug preventing debuffs triggering warning
