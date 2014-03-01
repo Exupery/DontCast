@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.1.2
+- fixed bug where Smoke Bomb would display an incorrect duration
+
 v1.1.1
 - added Touch of Karma and Diffuse Magic to default buff list
 - cooldown text color in red when less than 1.5 seconds remaining

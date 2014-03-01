@@ -138,7 +138,7 @@ function auraUpdated(self, event, unit, ...)
 end
 
 function displayCountdown(duration)
-	if duration then
+	if duration and duration > 0 then
 		if duration < 1.5 then
 			cdTextFrame:SetTextColor(1, 0.1, 0.1, 1)
 		else
