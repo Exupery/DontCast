@@ -138,14 +138,16 @@ function auraUpdated(self, event, unit, ...)
 end
 
 function displayCountdown(duration)
+	local txt = ""
 	if duration and duration > 0 then
 		if duration < 1.5 then
 			cdTextFrame:SetTextColor(1, 0.1, 0.1, 1)
 		else
 			cdTextFrame:SetTextColor(1, 1, 0.1, 0.85)
 		end
-		cdTextFrame:SetText(formatTime(duration))
+		txt = formatTime(duration)
 	end
+	cdTextFrame:SetText(txt)
 end
 
 function formatTime(remaining)
