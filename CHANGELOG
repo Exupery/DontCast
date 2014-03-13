@@ -2,6 +2,7 @@ DONTCAST CHANGE LOG
 ===================
 
 v1.1.2
+- threshold for changing color of countdown text is now customizable
 - display Smoke Bomb only when player not within the area of effect
 - fixed bug where Smoke Bomb would display an incorrect duration
 - only display Touch of Karma for the buffed Monk (not a debuffed recipient)

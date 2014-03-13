@@ -17,6 +17,8 @@ Warns a caster when their current target has buffs or debuffs that would greatly
 ## Commands
 * /dontcast add NAME - adds the named buff or debuff
 * /dontcast remove NAME - removes the named buff or debuff
+* /dontcast threshold #.## - set the threshold for changing color of countdown text
+* /dontcast show threshold - display the threshold color of countdown text changes
 * /dontcast list - display what will trigger the warning
 * /dontcast default - reverts to the default triggers
 * /dontcast show - Shows the frame for repositioning
@@ -27,4 +29,3 @@ Warns a caster when their current target has buffs or debuffs that would greatly
 ## TODOs
 * integrate with options UI
 * customizable text colors
-* customizable threshold for changing color of countdown text

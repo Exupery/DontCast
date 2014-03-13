@@ -5,6 +5,7 @@ local textFrame = nil
 local iconFrame = nil
 local cdTextFrame = nil
 local auras = {}
+local config = {}
 local updCtr = 0
 
 SlashCmdList["DONTCAST"] = function(cmd)
@@ -26,6 +27,13 @@ SlashCmdList["DONTCAST"] = function(cmd)
 			if aura then
 				removeAura(aura)
 			end
+		elseif string.match(cmd, "show%s+threshold") then
+			colorPrint("Countdown text changes color at "..config["threshold"].." seconds")
+		elseif string.match(cmd, "threshold%s+[0-9.]+") then
+			local threshold = string.match(cmd, "threshold%s+(.+)")
+			if threshold then
+				setThreshold(threshold)
+			end
 		elseif cmd=="list" then
 			displayAuras()
 		elseif cmd=="default" then
@@ -35,6 +43,8 @@ SlashCmdList["DONTCAST"] = function(cmd)
 			colorPrint("DontCast commands:")
 			print("/dontcast add NAME - adds the named buff or debuff")
 			print("/dontcast remove NAME - removes the named buff or debuff")
+			print("/dontcast threshold #.## - set the threshold for changing color of countdown text")
+			print("/dontcast show threshold - display the threshold color of countdown text changes")
 			print("/dontcast list - display what will trigger the warning")
 			print("/dontcast default - reverts to the default triggers")
 			print("/dontcast show - Shows the frame for repositioning")
@@ -76,6 +86,7 @@ function eventHandler(self, event, unit, ...)
 		targetChanged(self, event, unit)		
 	elseif event == "ADDON_LOADED" and unit == "DontCast" then
 		auras = savedAuras()		
+		config = savedConfig()
 	end
 end
 
@@ -152,7 +163,7 @@ end
 function displayCountdown(duration)
 	local txt = ""
 	if duration and duration > 0 then
-		if duration < 1.5 then
+		if duration < config["threshold"] then
 			cdTextFrame:SetTextColor(1, 0.1, 0.1, 1)
 		else
 			cdTextFrame:SetTextColor(1, 1, 0.1, 0.85)
@@ -219,6 +230,26 @@ function defaultAuras()
 			["Touch of Karma"] = true,
 			["Spell Reflection"] = true
 		}
+end
+
+function setThreshold(threshold)
+	local asNum = tonumber(threshold)
+	if type(asNum) == "number" then
+		DontCastConfig["threshold"] = asNum
+	end
+	if DontCastConfig["threshold"] == asNum then
+		config = savedConfig()
+		colorPrint("Threshold set to "..threshold)
+	else
+		errorPrint("Unable to set threshold to "..threshold)
+	end
+end
+
+function savedConfig()
+	if not DontCastConfig then
+		DontCastConfig = {["threshold"] = 1.5}
+	end
+	return DontCastConfig
 end
 
 function showFrame(frame)
