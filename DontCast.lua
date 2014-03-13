@@ -124,7 +124,7 @@ function auraUpdated(self, event, unit, ...)
 			if not name then
 				name, rank, icon, count, type, dur, expTime = UnitDebuff(unit, aura)
 			end
-			if name then
+			if name and validIfSmoke() and validIfKarma() then
 				textFrame:SetText(name)
 				iconFrame:SetTexture(icon)
 				showFrame(mainFrame)
@@ -135,6 +135,18 @@ function auraUpdated(self, event, unit, ...)
 			hideFrame(mainFrame)
 		end
 	end
+end
+
+function validIfSmoke()
+	--only concerned with Smoke Bomb when player NOT also in smoke
+	local targetInSmoke = UnitDebuff("target", "Smoke Bomb")
+	local playerInSmoke = UnitDebuff("player", "Smoke Bomb")
+	return not targetInSmoke or (targetInSmoke and playerInSmoke)
+end
+
+function validIfKarma()
+	local name, _, _, _, _, _, _, caster = UnitBuff("target", "Touch of Karma")
+	return not name or (name and caster == "target")
 end
 
 function displayCountdown(duration)
