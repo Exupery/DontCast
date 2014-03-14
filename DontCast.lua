@@ -156,8 +156,9 @@ function validIfSmoke()
 end
 
 function validIfKarma()
-	local name, _, _, _, _, _, _, caster = UnitBuff("target", "Touch of Karma")
-	return not name or (name and caster == "target")
+	local name = UnitBuff("target", "Touch of Karma")
+	local _, classFileName = UnitClass("target")
+	return not name or (name and classFileName == "MONK")
 end
 
 function displayCountdown(duration)
