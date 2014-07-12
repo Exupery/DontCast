@@ -1,12 +1,13 @@
 # DontCast
-### World of Warcraft caster PvP addon
-Warns a caster when their current target has buffs or debuffs that would greatly reduce or eliminate the affect of casting spells. Displays the name and icon of the buff/debuff, as well as a timer displaying a countdown of time remaining until the effect expires. Buffs and debuffs can be added and removed with the appropriate slash commands.
+### World of Warcraft PvP addon
+Warns a player when their current target has buffs or debuffs that would eliminate (or significantly mitigate) the effect of casting damage-dealing spells. [While the default buff/debuff list is most relevant to casters the list can be easily modified to suit melee]. Displays the name and icon of the buff/debuff, as well as a timer displaying a countdown of time remaining until the effect expires. Buffs and debuffs can be added and removed with the appropriate slash commands.
 
 ## Default Buffs/Debuffs
 * Anti-Magic Shell
 * Cloak of Shadows
 * Cyclone
 * Deterrence
+* Dispersion
 * Divine Shield
 * Ice Block
 * Smoke Bomb

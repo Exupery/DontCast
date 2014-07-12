@@ -135,7 +135,7 @@ function auraUpdated(self, event, unit, ...)
 			if not name then
 				name, rank, icon, count, type, dur, expTime = UnitDebuff(unit, aura)
 			end
-			if name and validIfSmoke() and validIfKarma() then
+			if name and isValid(name) then
 				textFrame:SetText(name)
 				iconFrame:SetTexture(icon)
 				showFrame(mainFrame)
@@ -148,17 +148,28 @@ function auraUpdated(self, event, unit, ...)
 	end
 end
 
-function validIfSmoke()
+function isValid(name)
+	if (name == "Smoke Bomb") then
+		return validSmoke()
+	elseif (name == "Touch of Karma") then
+		return validKarma()
+	else
+		return true
+	end
+end
+
+function validSmoke()
 	--only concerned with Smoke Bomb when player NOT also in smoke
 	local targetInSmoke = UnitDebuff("target", "Smoke Bomb")
 	local playerInSmoke = UnitDebuff("player", "Smoke Bomb")
-	return not targetInSmoke or (targetInSmoke and playerInSmoke)
+	return (targetInSmoke and not playerInSmoke) or (not targetInSmoke and playerInSmoke)
 end
 
-function validIfKarma()
+function validKarma()
+	--only display ToK for buffed Monk, not the recipient
 	local name = UnitBuff("target", "Touch of Karma")
 	local _, classFileName = UnitClass("target")
-	return not name or (name and classFileName == "MONK")
+	return name and classFileName == "MONK"
 end
 
 function displayCountdown(duration)
@@ -224,12 +235,13 @@ function defaultAuras()
 			["Cloak of Shadows"] = true,
 			["Cyclone"] = true,
 			["Deterrence"] = true,
+			["Diffuse Magic"] = true,
+			["Dispersion"] = true,
 			["Divine Shield"] = true,
 			["Ice Block"] = true,
 			["Smoke Bomb"] = true,
-			["Diffuse Magic"] = true,
-			["Touch of Karma"] = true,
-			["Spell Reflection"] = true
+			["Spell Reflection"] = true,
+			["Touch of Karma"] = true
 		}
 end
 

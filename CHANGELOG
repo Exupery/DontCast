@@ -1,6 +1,11 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.1.3
+- added Dispersion to default buff list
+- corrected Smoke Bomb logic
+- fixed bug where Touch of Karma could still show on a debuffed recipient
+
 v1.1.2
 - threshold for changing color of countdown text is now customizable
 - display Smoke Bomb only when player not within the area of effect
