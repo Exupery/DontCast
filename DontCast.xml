@@ -6,10 +6,8 @@
 		</Size>
 		<Scripts>
 			<OnLoad>
-				onLoad(self, SpellText, SpellIcon, CountdownText)
+				loadDontCast(self, SpellText, SpellIcon, CountdownText)
 			</OnLoad>
-			<OnDragStart function="dragStart" />
-			<OnDragStop function="dragStop" />
 		</Scripts>
 		<Anchors>
 			<Anchor point="CENTER">

@@ -1,6 +1,12 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.1.4
+- use left or right click to move
+- use "center" instead of "reset" to center addon
+- changed non-error text color
+- fixed function scope to avoid conflict with other addons
+
 v1.1.3
 - added Dispersion to default buff list
 - corrected Smoke Bomb logic
