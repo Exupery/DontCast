@@ -24,7 +24,7 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 * /dontcast default - reverts to the default triggers
 * /dontcast show - Shows the frame for repositioning
 * /dontcast hide - Locks (and hides) the frame
-* /dontcast reset - Resets the position to center of screen
+* /dontcast center - Sets the position to center of screen
 * /dontcast ? or /dontcast help - Prints the command list
 
 ## TODOs
