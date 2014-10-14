@@ -1,4 +1,4 @@
-## Interface: 50400
+## Interface: 60000
 ## Title: DontCast
 ## Notes: Warns when target is immune to casts
 ## Author: Exupery

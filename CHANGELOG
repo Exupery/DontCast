@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.1.5
+- updated for 6.0
+
 v1.1.4
 - use left or right click to move
 - use "center" instead of "reset" to center addon
