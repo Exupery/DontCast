@@ -28,5 +28,6 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 * /dontcast ? or /dontcast help - Prints the command list
 
 ## TODOs
+* make icon/text resizable
 * integrate with options UI
 * customizable text colors

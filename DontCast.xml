@@ -1,9 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
  	<Script File="DontCast.lua"/>
- 	<Frame name="DontCastUI" parent="UIParent" enablekeyboard="true" clampedToScreen="true" movable="true">
- 		<Size>
-			<AbsDimension x="300" y="150"/>
-		</Size>
+ 	<Frame name="DontCastUI" parent="UIParent" enablekeyboard="true">
+ 		<Size x="300" y="50"/>
 		<Scripts>
 			<OnLoad>
 				loadDontCast(self, SpellText, SpellIcon, CountdownText)
@@ -17,17 +15,17 @@
 		<Layers>
 			<Layer level="ARTWORK">
 				<Texture setAllPoints="true">
-					<Color r="0.7" g="0.4" b="0.65" a="0" />
+					<Color r="0.7" g="0.4" b="0.65" a="0.9" />
 				</Texture>
 				<FontString name="SpellText" font="Fonts\SKURRI.TTF" justifyH="LEFT" text="">
 					<Color r="1" g="1" b="0.1" a="0.9" />
-					<Size x="300" y="50"/>
+					<RelDimension x="0.75" y="1.0"/>
 					<Shadow>
           				<Color r="0.1" g="0.1" b="0.1" a="0.9"/>
           				<Offset x="2" y="-2"/>
         			</Shadow>
 					<FontHeight>
-				      	<AbsValue val="75"/>
+				      	<AbsValue val="30"/>
 				    </FontHeight>
 					<Anchors>
 						<Anchor point="LEFT">

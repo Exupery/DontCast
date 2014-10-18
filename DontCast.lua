@@ -4,6 +4,7 @@ local mainFrame = nil
 local textFrame = nil
 local iconFrame = nil
 local cdTextFrame = nil
+local resizeButton = nil
 local auras = {}
 local config = {}
 local updCtr = 0
@@ -38,14 +39,6 @@ end
 
 local function moveToCenter(frame)
 	frame:SetPoint("CENTER")
-end
-
-local function dragStart(self, button)
-	self:StartMoving()
-end
-
-local function dragStop(self, button)
-	self:StopMovingOrSizing()
 end
 
 local function savedConfig()
@@ -226,12 +219,37 @@ local function eventHandler(self, event, unit, ...)
 	end
 end
 
+function resized(frame, width, height)
+	local font = textFrame:GetFont()
+	textFrame:SetFont(font, height * 0.75)
+end
+
 function loadDontCast(self, text, icon, cdText)
 	if self and text and icon and cdText then
 		mainFrame = self
+		mainFrame:SetClampedToScreen(true)
+		mainFrame:SetMovable(true)
 		mainFrame:RegisterForDrag("LeftButton", "RightButton")
 		mainFrame:SetScript("OnDragStart", mainFrame.StartMoving)
 		mainFrame:SetScript("OnDragStop", mainFrame.StopMovingOrSizing)
+
+		mainFrame:SetResizable(true)
+		mainFrame:SetMinResize(12, 12)
+		mainFrame:SetScript("OnSizeChanged", resized)
+
+		resizeButton = CreateFrame("Button", nil, mainFrame)
+		resizeButton:SetSize(16, 16)
+		resizeButton:SetPoint("BOTTOMRIGHT")
+		resizeButton:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		resizeButton:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+		resizeButton:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+
+		resizeButton:SetScript("OnMouseDown", function()
+			mainFrame:StartSizing("BOTTOMRIGHT")
+		end)
+		resizeButton:SetScript("OnMouseUp", function()
+			mainFrame:StopMovingOrSizing()
+		end)
 
 		textFrame = text
 		iconFrame = icon
