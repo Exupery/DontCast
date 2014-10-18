@@ -22,12 +22,11 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 * /dontcast show threshold - display the threshold color of countdown text changes
 * /dontcast list - display what will trigger the warning
 * /dontcast default - reverts to the default triggers
-* /dontcast show - Shows the frame for repositioning
-* /dontcast hide - Locks (and hides) the frame
+* /dontcast show - Shows the addon and allows repositioning and resizing
+* /dontcast hide - Hides (and locks) the addon
 * /dontcast center - Sets the position to center of screen
 * /dontcast ? or /dontcast help - Prints the command list
 
 ## TODOs
-* make icon/text resizable
 * integrate with options UI
 * customizable text colors

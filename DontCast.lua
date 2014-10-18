@@ -17,28 +17,27 @@ local function errorPrint(err)
 	print("|cffff0000"..err)
 end
 
-local function showFrame(frame)
-	frame:Show()
-end
-
-local function hideFrame(frame)
-	frame:Hide()
+local function hideIfNotInConfig()
+	if not mainFrame:IsMouseEnabled() then
+		mainFrame:Hide()
+	end
 end
 
 local function showAndUnlockFrame(frame, text)
 	text:SetText("Click here to move")
+	cdTextFrame:SetText("")
 	iconFrame:SetTexture("Interface\\ICONS\\INV_Misc_QuestionMark")
-	showFrame(frame)
+	resizeButton:Show()
+	frame:Show()
 	frame:EnableMouse(true)
 end
 
-local function hideAndLockFrame(frame)
-	frame:EnableMouse(false)
-	hideFrame(frame)
-end
-
-local function moveToCenter(frame)
-	frame:SetPoint("CENTER")
+local function lockFrame(hide)
+	mainFrame:EnableMouse(false)
+	resizeButton:Hide()
+	if hide then
+		mainFrame:Hide()
+	end
 end
 
 local function savedConfig()
@@ -173,12 +172,12 @@ local function auraUpdated(self, event, unit, ...)
 			if name and isValid(name) then
 				textFrame:SetText(name)
 				iconFrame:SetTexture(icon)
-				showFrame(mainFrame)
+				mainFrame:Show()
 				hasAura = true
 			end
 		end
 		if not hasAura then
-			hideFrame(mainFrame)
+			hideIfNotInConfig()
 		end
 	end
 end
@@ -187,7 +186,7 @@ local function targetChanged(self, event, unit, ...)
 	if targetIsHostile() then
 		auraUpdated(self, event, "target")
 	else
-		hideFrame(mainFrame)
+		hideIfNotInConfig()
 	end
 end
 
@@ -212,16 +211,21 @@ local function eventHandler(self, event, unit, ...)
 	if event == "UNIT_AURA" then
 		auraUpdated(self, event, unit)
 	elseif event == "PLAYER_TARGET_CHANGED" then
-		targetChanged(self, event, unit)		
+		targetChanged(self, event, unit)
+	elseif event == "PLAYER_REGEN_DISABLED" then
+		lockFrame(false)
 	elseif event == "ADDON_LOADED" and unit == "DontCast" then
 		auras = savedAuras()		
 		config = savedConfig()
 	end
 end
 
-function resized(frame, width, height)
+local function resized(frame, width, height)
 	local font = textFrame:GetFont()
+	iconFrame:SetSize(height, height)
+	cdTextFrame:SetFont(font, height * 0.95)
 	textFrame:SetFont(font, height * 0.75)
+	textFrame:SetPoint("LEFT", height * 1.1, 0)
 end
 
 function loadDontCast(self, text, icon, cdText)
@@ -234,7 +238,8 @@ function loadDontCast(self, text, icon, cdText)
 		mainFrame:SetScript("OnDragStop", mainFrame.StopMovingOrSizing)
 
 		mainFrame:SetResizable(true)
-		mainFrame:SetMinResize(12, 12)
+		mainFrame:SetMinResize(32, 16)
+		mainFrame:SetMaxResize(512, 256)
 		mainFrame:SetScript("OnSizeChanged", resized)
 
 		resizeButton = CreateFrame("Button", nil, mainFrame)
@@ -259,11 +264,11 @@ function loadDontCast(self, text, icon, cdText)
 		eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
 		eventFrame:RegisterEvent("ADDON_LOADED")
 		eventFrame:RegisterEvent("UNIT_AURA")
+		eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
 		eventFrame:SetScript("OnEvent", eventHandler)
-		local countdownEventFrame = CreateFrame("Frame", "cdEventFrame", UIParent)
 		eventFrame:SetScript("OnUpdate", onUpdate)
 
-		hideAndLockFrame(mainFrame)
+		lockFrame(true)
 		colorPrint("DontCast loaded, for help type /dontcast ?")
 	else
 		errorPrint("Unable to load DontCast!")
@@ -273,12 +278,12 @@ end
 SlashCmdList["DONTCAST"] = function(cmd)
 	if mainFrame and textFrame and iconFrame then
 		if cmd=="show" then
-			colorPrint("Click and drag to move, when done type /dontcast hide")
+			colorPrint("Drag text or icon to move, lower-right-corner to resize, when done type /dontcast hide")
 			showAndUnlockFrame(mainFrame, textFrame)
 		elseif cmd=="hide" then
-			hideAndLockFrame(mainFrame)
+			lockFrame(true)
 		elseif cmd=="center" then
-			moveToCenter(mainFrame)
+			mainFrame:SetPoint("CENTER")
 		elseif string.match(cmd, "add%s+%w+") then
 			local aura = string.match(cmd, "add%s+(.+)")
 			if aura then
@@ -309,8 +314,8 @@ SlashCmdList["DONTCAST"] = function(cmd)
 			print("/dontcast show threshold - display the threshold color of countdown text changes")
 			print("/dontcast list - display what will trigger the warning")
 			print("/dontcast default - reverts to the default triggers")
-			print("/dontcast show - Shows the frame for repositioning")
-			print("/dontcast hide - Locks (and hides) the frame")
+			print("/dontcast show - Shows the addon for repositioning and resizing")
+			print("/dontcast hide - Hides (and locks) the frame")
 			print("/dontcast center - Sets the position to center of screen")
 			print("/dontcast ? or /dontcast help - Prints this list")
 		end

@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.2
+- addon is now resizable via `/dontcast show`
+
 v1.1.5
 - updated interface version for 6.0
 
