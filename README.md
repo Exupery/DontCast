@@ -30,3 +30,4 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 ## TODOs
 * integrate with options UI
 * customizable text colors
+* customizable text font
