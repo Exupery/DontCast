@@ -3,6 +3,7 @@ SLASH_DONTCAST1 = "/dontcast"
 local mainFrame = nil
 local textFrame = nil
 local iconFrame = nil
+local optionsFrame = nil
 local cdTextFrame = nil
 local resizeButton = nil
 local auras = {}
@@ -23,13 +24,13 @@ local function hideIfNotInConfig()
 	end
 end
 
-local function showAndUnlockFrame(frame, text)
-	text:SetText("Click here to move")
+local function showAndUnlockFrame()
+	textFrame:SetText("Click here to move")
 	cdTextFrame:SetText("")
 	iconFrame:SetTexture("Interface\\ICONS\\INV_Misc_QuestionMark")
 	resizeButton:Show()
-	frame:Show()
-	frame:EnableMouse(true)
+	mainFrame:Show()
+	mainFrame:EnableMouse(true)
 end
 
 local function lockFrame(hide)
@@ -38,6 +39,15 @@ local function lockFrame(hide)
 	if hide then
 		mainFrame:Hide()
 	end
+end
+
+local function hideAndLockFrame()
+	lockFrame(true)
+end
+
+local function centerFrame()
+	mainFrame:ClearAllPoints()
+	mainFrame:SetPoint("CENTER", UIParent, "CENTER")
 end
 
 local function savedConfig()
@@ -50,9 +60,9 @@ end
 local function setThreshold(threshold)
 	local asNum = tonumber(threshold)
 	if type(asNum) == "number" then
-		DontCastConfig["threshold"] = asNum
+		DontCastConfig.threshold = asNum
 	end
-	if DontCastConfig["threshold"] == asNum then
+	if DontCastConfig.threshold == asNum then
 		config = savedConfig()
 		colorPrint("Threshold set to "..threshold)
 	else
@@ -123,7 +133,7 @@ end
 local function displayCountdown(duration)
 	local txt = ""
 	if duration and duration > 0 then
-		if duration < config["threshold"] then
+		if duration < config.threshold then
 			cdTextFrame:SetTextColor(1, 0.1, 0.1, 1)
 		else
 			cdTextFrame:SetTextColor(1, 1, 0.1, 0.85)
@@ -228,6 +238,58 @@ local function resized(frame, width, height)
 	textFrame:SetPoint("LEFT", height * 1.1, 0)
 end
 
+local function createButton(text, parent)
+	local button = CreateFrame("Button", text.."Button", parent, "UIPanelButtonTemplate")
+	button:SetHeight(20)
+	button:SetWidth(100)
+	button:SetText(text)
+	button:ClearAllPoints()
+	return button
+end
+
+local function saveOptions()
+	print "saveOptions() called" -- TODO DELME
+	-- TODO SAVE OPTIONS TO CONFIG
+end
+
+local function createOptionsPanel()
+	local xOffset = 20
+	optionsFrame = CreateFrame("Frame", "Options", UIParent)
+	optionsFrame.name = "DontCast"
+	InterfaceOptions_AddCategory(optionsFrame)
+
+	optionsFrame.okay = saveOptions
+	optionsFrame.cancel = hideAndLockFrame
+
+	optionsFrame.title = optionsFrame:CreateFontString("DontCastOptionsTitle", "OVERLAY", "GameFontNormalLarge")
+	optionsFrame.title:SetPoint("TOPLEFT", xOffset, -20)
+	optionsFrame.title:SetText("DontCast Options")
+
+	local unlockButton = createButton("Unlock", optionsFrame)
+	local lockButton = createButton("Lock", optionsFrame)
+	local centerButton = createButton("Center", optionsFrame)
+
+	local buttonY = -50
+	local buttonWidth = unlockButton:GetWidth()
+	unlockButton:SetPoint("TOPLEFT", xOffset, buttonY)
+	unlockButton:SetScript("PostClick", showAndUnlockFrame)
+	lockButton:SetPoint("TOPLEFT", xOffset * 2 + buttonWidth, buttonY)
+	lockButton:SetScript("PostClick", hideAndLockFrame)
+	centerButton:SetPoint("TOPLEFT", xOffset * 3 + buttonWidth * 2, buttonY)
+	centerButton:SetScript("PostClick", centerFrame)
+
+	-- TODO add aura
+	-- TODO remove aura
+	-- TODO list/show auras
+	-- TODO revert to default auras
+	-- TODO set threshold
+	-- TODO text color
+	-- TODO text font
+	-- TODO toggle sound
+
+	errorPrint("OPTIONS FRAME CREATED") -- TODO DELME
+end
+
 function loadDontCast(self, text, icon, cdText)
 	if self and text and icon and cdText then
 		mainFrame = self
@@ -269,6 +331,7 @@ function loadDontCast(self, text, icon, cdText)
 		eventFrame:SetScript("OnUpdate", onUpdate)
 
 		lockFrame(true)
+		createOptionsPanel()
 		colorPrint("DontCast loaded, for help type /dontcast ?")
 	else
 		errorPrint("Unable to load DontCast!")
@@ -277,13 +340,13 @@ end
 
 SlashCmdList["DONTCAST"] = function(cmd)
 	if mainFrame and textFrame and iconFrame then
-		if cmd=="show" then
+		if cmd == "show" or cmd == "unlock" then
 			colorPrint("Drag text or icon to move, lower-right-corner to resize, when done type /dontcast hide")
-			showAndUnlockFrame(mainFrame, textFrame)
-		elseif cmd=="hide" then
+			showAndUnlockFrame()
+		elseif cmd == "hide" or cmd == "lock" then
 			lockFrame(true)
-		elseif cmd=="center" then
-			mainFrame:SetPoint("CENTER")
+		elseif cmd == "center" then
+			centerFrame()
 		elseif string.match(cmd, "add%s+%w+") then
 			local aura = string.match(cmd, "add%s+(.+)")
 			if aura then
@@ -295,17 +358,19 @@ SlashCmdList["DONTCAST"] = function(cmd)
 				removeAura(aura)
 			end
 		elseif string.match(cmd, "show%s+threshold") then
-			colorPrint("Countdown text changes color at "..config["threshold"].." seconds")
+			colorPrint("Countdown text changes color at "..config.threshold.." seconds")
 		elseif string.match(cmd, "threshold%s+[0-9.]+") then
 			local threshold = string.match(cmd, "threshold%s+(.+)")
 			if threshold then
 				setThreshold(threshold)
 			end
-		elseif cmd=="list" then
+		elseif cmd == "list" then
 			displayAuras()
-		elseif cmd=="default" then
+		elseif cmd == "default" then
 			DontCastAuras = defaultAuras()
-			colorPrint("DontCast reverted to default triggers")			
+			colorPrint("DontCast reverted to default triggers")
+		elseif string.match(cmd, "config%w*") then
+			InterfaceOptionsFrame_OpenToCategory("DontCast")
 		else
 			colorPrint("DontCast commands:")
 			print("/dontcast add NAME - adds the named buff or debuff")
@@ -317,6 +382,7 @@ SlashCmdList["DONTCAST"] = function(cmd)
 			print("/dontcast show - Shows the addon for repositioning and resizing")
 			print("/dontcast hide - Hides (and locks) the frame")
 			print("/dontcast center - Sets the position to center of screen")
+			print("/dontcast config - Opens the options panel")
 			print("/dontcast ? or /dontcast help - Prints this list")
 		end
 	else

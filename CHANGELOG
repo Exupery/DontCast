@@ -1,6 +1,10 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.2.1
+- integrated with addon options UI
+- fixed a bug where `/dontcast center` would have no effect
+
 v1.2
 - addon is now resizable via `/dontcast show`
 

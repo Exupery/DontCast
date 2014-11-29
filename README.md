@@ -25,10 +25,10 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 * /dontcast show - Shows the addon and allows repositioning and resizing
 * /dontcast hide - Hides (and locks) the addon
 * /dontcast center - Sets the position to center of screen
+* /dontcast config - Opens the options UI
 * /dontcast ? or /dontcast help - Prints the command list
 
 ## TODOs
-* integrate with options UI
 * customizable text colors
 * customizable text font
 * add (optional) sound on aura up/down
