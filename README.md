@@ -31,3 +31,4 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 * integrate with options UI
 * customizable text colors
 * customizable text font
+* add (optional) sound on aura up/down
