@@ -277,6 +277,10 @@ local function drawThresholdOptions(parent, xOffset, yOffset)
 	parent.threshold = createInputBox("threshold", parent)
 	parent.threshold:SetMaxLetters(4)
 	parent.threshold:SetPoint("TOPLEFT", xOffset, yOffset)
+
+	local textFrame = optionsFrame:CreateFontString("ThresholdText", "OVERLAY", "GameFontNormal")
+	textFrame:SetPoint("LEFT", parent.threshold, "RIGHT", 10, 0)
+	textFrame:SetText("Expiring soon threshold (seconds)")
 end
 
 local function saveOptions()
@@ -297,7 +301,7 @@ local function createOptionsPanel()
 	optionsFrame.title:SetText("DontCast Options")
 
 	drawPositioningOptions(optionsFrame, xOffset, -50)
-	drawThresholdOptions(optionsFrame, xOffset, -75)
+	drawThresholdOptions(optionsFrame, xOffset, -85)
 
 	-- TODO add aura
 	-- TODO remove aura
