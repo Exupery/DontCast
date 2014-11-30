@@ -247,9 +247,40 @@ local function createButton(text, parent)
 	return button
 end
 
+local function createInputBox(text, parent)
+	local box = CreateFrame("EditBox", text.."EditBox", parent, "InputBoxTemplate")
+	box:SetHeight(20)
+	box:SetWidth(35)
+	box:SetAutoFocus(false)
+	box:ClearAllPoints()
+	box:SetText(text)
+	return box
+end
+
+local function drawPositioningOptions(parent, xOffset, yOffset)
+	local unlockButton = createButton("Unlock", parent)
+	local lockButton = createButton("Lock", parent)
+	local centerButton = createButton("Center", parent)
+	local buttonWidth = unlockButton:GetWidth()
+
+	unlockButton:SetPoint("TOPLEFT", xOffset, yOffset)
+	unlockButton:SetScript("PostClick", showAndUnlockFrame)
+
+	lockButton:SetPoint("TOPLEFT", xOffset * 2 + buttonWidth, yOffset)
+	lockButton:SetScript("PostClick", hideAndLockFrame)
+
+	centerButton:SetPoint("TOPLEFT", xOffset * 3 + buttonWidth * 2, yOffset)
+	centerButton:SetScript("PostClick", centerFrame)
+end
+
+local function drawThresholdOptions(parent, xOffset, yOffset)
+	parent.threshold = createInputBox("threshold", parent)
+	parent.threshold:SetMaxLetters(4)
+	parent.threshold:SetPoint("TOPLEFT", xOffset, yOffset)
+end
+
 local function saveOptions()
-	print "saveOptions() called" -- TODO DELME
-	-- TODO SAVE OPTIONS TO CONFIG
+	setThreshold(optionsFrame.threshold:GetText())
 end
 
 local function createOptionsPanel()
@@ -265,29 +296,22 @@ local function createOptionsPanel()
 	optionsFrame.title:SetPoint("TOPLEFT", xOffset, -20)
 	optionsFrame.title:SetText("DontCast Options")
 
-	local unlockButton = createButton("Unlock", optionsFrame)
-	local lockButton = createButton("Lock", optionsFrame)
-	local centerButton = createButton("Center", optionsFrame)
-
-	local buttonY = -50
-	local buttonWidth = unlockButton:GetWidth()
-	unlockButton:SetPoint("TOPLEFT", xOffset, buttonY)
-	unlockButton:SetScript("PostClick", showAndUnlockFrame)
-	lockButton:SetPoint("TOPLEFT", xOffset * 2 + buttonWidth, buttonY)
-	lockButton:SetScript("PostClick", hideAndLockFrame)
-	centerButton:SetPoint("TOPLEFT", xOffset * 3 + buttonWidth * 2, buttonY)
-	centerButton:SetScript("PostClick", centerFrame)
+	drawPositioningOptions(optionsFrame, xOffset, -50)
+	drawThresholdOptions(optionsFrame, xOffset, -75)
 
 	-- TODO add aura
 	-- TODO remove aura
 	-- TODO list/show auras
 	-- TODO revert to default auras
-	-- TODO set threshold
 	-- TODO text color
 	-- TODO text font
 	-- TODO toggle sound
 
 	errorPrint("OPTIONS FRAME CREATED") -- TODO DELME
+end
+
+local function updateOptionsUI()
+	optionsFrame.threshold:SetText(config.threshold)
 end
 
 function loadDontCast(self, text, icon, cdText)
@@ -370,7 +394,10 @@ SlashCmdList["DONTCAST"] = function(cmd)
 			DontCastAuras = defaultAuras()
 			colorPrint("DontCast reverted to default triggers")
 		elseif string.match(cmd, "config%w*") then
+			-- call twice to workaround WoW bug where very first call opens wrong tab
 			InterfaceOptionsFrame_OpenToCategory("DontCast")
+			InterfaceOptionsFrame_OpenToCategory("DontCast")
+			updateOptionsUI() -- values may have been modified via slash commands
 		else
 			colorPrint("DontCast commands:")
 			print("/dontcast add NAME - adds the named buff or debuff")
