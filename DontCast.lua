@@ -57,14 +57,14 @@ local function savedConfig()
 	return DontCastConfig
 end
 
-local function setThreshold(threshold)
+local function setThreshold(threshold, echo)
 	local asNum = tonumber(threshold)
 	if type(asNum) == "number" then
 		DontCastConfig.threshold = asNum
 	end
 	if DontCastConfig.threshold == asNum then
 		config = savedConfig()
-		colorPrint("Threshold set to "..threshold)
+		if echo then colorPrint("Threshold set to "..threshold) end
 	else
 		errorPrint("Unable to set threshold to "..threshold)
 	end
@@ -284,7 +284,7 @@ local function drawThresholdOptions(parent, xOffset, yOffset)
 end
 
 local function saveOptions()
-	setThreshold(optionsFrame.threshold:GetText())
+	setThreshold(optionsFrame.threshold:GetText(), false)
 end
 
 local function createOptionsPanel()
@@ -390,7 +390,7 @@ SlashCmdList["DONTCAST"] = function(cmd)
 		elseif string.match(cmd, "threshold%s+[0-9.]+") then
 			local threshold = string.match(cmd, "threshold%s+(.+)")
 			if threshold then
-				setThreshold(threshold)
+				setThreshold(threshold, true)
 			end
 		elseif cmd == "list" then
 			displayAuras()
