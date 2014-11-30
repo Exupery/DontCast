@@ -238,6 +238,16 @@ local function resized(frame, width, height)
 	textFrame:SetPoint("LEFT", height * 1.1, 0)
 end
 
+local function changeFontStyle(style)
+	errorPrint("IAMHERE") 	-- TODO DELME
+	print(style) -- TODO DELME
+end
+
+local function setFontStyle(self)
+	changeFontStyle(self.value)
+	UIDropDownMenu_SetSelectedID(optionsFrame.fontstyle, self:GetID())
+end
+
 local function createButton(text, parent)
 	local button = CreateFrame("Button", text.."Button", parent, "UIPanelButtonTemplate")
 	button:SetHeight(20)
@@ -247,14 +257,46 @@ local function createButton(text, parent)
 	return button
 end
 
-local function createInputBox(text, parent)
-	local box = CreateFrame("EditBox", text.."EditBox", parent, "InputBoxTemplate")
+local function createInputBox(name, parent)
+	local box = CreateFrame("EditBox", name.."EditBox", parent, "InputBoxTemplate")
 	box:SetHeight(20)
 	box:SetWidth(35)
 	box:SetAutoFocus(false)
 	box:ClearAllPoints()
-	box:SetText(text)
 	return box
+end
+
+local function createDropDownInfo(text, value, func)
+	local info = UIDropDownMenu_CreateInfo()
+	info.text = text
+	info.value = value
+	info.func = func
+
+	UIDropDownMenu_AddButton(info)
+end
+
+local function fontStyleDropDown_OnLoad()
+	local fonts = {
+		Arial = "Fonts\\ARIALN.TTF",
+		FritzQuad = "Fonts\\FRIZQT__.TTF",
+		Morpheus = "Fonts\\MORPHEUS.ttf",
+		Skurri = "Fonts\\skurri.ttf"
+	}
+
+	local sorted = {}
+	for k, v in pairs(fonts) do
+		table.insert(sorted, k)
+	end	
+	table.sort(sorted)
+	for i, k in ipairs(sorted) do
+		createDropDownInfo(k, fonts[k], setFontStyle)
+	end
+end
+
+local function createDropDown(name, parent)
+	local dropdown = CreateFrame("Button", name.."DropDown", parent, "UIDropDownMenuTemplate")
+	dropdown:ClearAllPoints()
+	return dropdown
 end
 
 local function drawPositioningOptions(parent, xOffset, yOffset)
@@ -283,6 +325,17 @@ local function drawThresholdOptions(parent, xOffset, yOffset)
 	textFrame:SetText("Expiring soon threshold (seconds)")
 end
 
+local function drawFontStyleOptions(parent, xOffset, yOffset)
+	local textFrame = parent:CreateFontString("FontStyleText", "OVERLAY", "GameFontNormal")
+	textFrame:SetPoint("TOPLEFT", xOffset, yOffset)
+	textFrame:SetText("Font")
+
+	parent.fontstyle = createDropDown("fontstyle", parent)
+	parent.fontstyle:SetPoint("LEFT", textFrame, "RIGHT", 0, 0)
+	UIDropDownMenu_Initialize(parent.fontstyle, fontStyleDropDown_OnLoad)
+	UIDropDownMenu_SetSelectedID(parent.fontstyle, 1)
+end
+
 local function saveOptions()
 	setThreshold(optionsFrame.threshold:GetText(), false)
 end
@@ -302,13 +355,13 @@ local function createOptionsPanel()
 
 	drawPositioningOptions(optionsFrame, xOffset, -50)
 	drawThresholdOptions(optionsFrame, xOffset, -85)
+	drawFontStyleOptions(optionsFrame, xOffset, -125)
 
 	-- TODO add aura
 	-- TODO remove aura
 	-- TODO list/show auras
 	-- TODO revert to default auras
 	-- TODO text color
-	-- TODO text font
 	-- TODO toggle sound
 
 	errorPrint("OPTIONS FRAME CREATED") -- TODO DELME
