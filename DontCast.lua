@@ -52,22 +52,40 @@ end
 
 local function savedConfig()
 	if not DontCastConfig then
-		DontCastConfig = {["threshold"] = 1.5}
+		DontCastConfig = {
+			threshold = 1.5,
+			fontstyle = "Fonts\\SKURRI.TTF"
+		}
 	end
 	return DontCastConfig
+end
+
+local function updateConfig(key, value)
+	DontCastConfig[key] = value
+	local updated = DontCastConfig[key] == value
+	if updated then
+		config = savedConfig()
+	end
+	return updated
 end
 
 local function setThreshold(threshold, echo)
 	local asNum = tonumber(threshold)
 	if type(asNum) == "number" then
-		DontCastConfig.threshold = asNum
-	end
-	if DontCastConfig.threshold == asNum then
-		config = savedConfig()
-		if echo then colorPrint("Threshold set to "..threshold) end
+		local updated = updateConfig("threshold", asNum)
+		if updated then
+			if echo then colorPrint("Threshold set to "..threshold) end
+		else
+			errorPrint("Unable to set threshold to "..threshold)
+		end
 	else
-		errorPrint("Unable to set threshold to "..threshold)
+		errorPrint("Threshold NOT changed! Must be set to a number.")
 	end
+end
+
+local function setFontStyle(style)
+	cdTextFrame:SetFont(style, mainFrame:GetHeight() * 0.95)
+	textFrame:SetFont(style, mainFrame:GetHeight() * 0.75)
 end
 
 local function defaultAuras()
@@ -227,6 +245,7 @@ local function eventHandler(self, event, unit, ...)
 	elseif event == "ADDON_LOADED" and unit == "DontCast" then
 		auras = savedAuras()		
 		config = savedConfig()
+		setFontStyle(config.fontstyle)
 	end
 end
 
@@ -238,13 +257,8 @@ local function resized(frame, width, height)
 	textFrame:SetPoint("LEFT", height * 1.1, 0)
 end
 
-local function changeFontStyle(style)
-	errorPrint("IAMHERE") 	-- TODO DELME
-	print(style) -- TODO DELME
-end
-
-local function setFontStyle(self)
-	changeFontStyle(self.value)
+local function fontStyleSelected(self)
+	setFontStyle(self.value)
 	UIDropDownMenu_SetSelectedID(optionsFrame.fontstyle, self:GetID())
 end
 
@@ -289,7 +303,11 @@ local function fontStyleDropDown_OnLoad()
 	end	
 	table.sort(sorted)
 	for i, k in ipairs(sorted) do
-		createDropDownInfo(k, fonts[k], setFontStyle)
+		createDropDownInfo(k, fonts[k], fontStyleSelected)
+	end
+
+	if not UIDropDownMenu_GetSelectedID(optionsFrame.fontstyle) then
+		UIDropDownMenu_SetSelectedValue(optionsFrame.fontstyle, config.fontstyle)
 	end
 end
 
@@ -320,24 +338,30 @@ local function drawThresholdOptions(parent, xOffset, yOffset)
 	parent.threshold:SetMaxLetters(4)
 	parent.threshold:SetPoint("TOPLEFT", xOffset, yOffset)
 
-	local textFrame = optionsFrame:CreateFontString("ThresholdText", "OVERLAY", "GameFontNormal")
+	local textFrame = optionsFrame:CreateFontString("DontCastThresholdText", "OVERLAY", "GameFontNormal")
 	textFrame:SetPoint("LEFT", parent.threshold, "RIGHT", 10, 0)
 	textFrame:SetText("Expiring soon threshold (seconds)")
 end
 
 local function drawFontStyleOptions(parent, xOffset, yOffset)
-	local textFrame = parent:CreateFontString("FontStyleText", "OVERLAY", "GameFontNormal")
+	local textFrame = parent:CreateFontString("DontCastFontStyleText", "OVERLAY", "GameFontNormal")
 	textFrame:SetPoint("TOPLEFT", xOffset, yOffset)
 	textFrame:SetText("Font")
 
-	parent.fontstyle = createDropDown("fontstyle", parent)
+	parent.fontstyle = createDropDown("DontCastFontStyle", parent)
 	parent.fontstyle:SetPoint("LEFT", textFrame, "RIGHT", 0, 0)
 	UIDropDownMenu_Initialize(parent.fontstyle, fontStyleDropDown_OnLoad)
-	UIDropDownMenu_SetSelectedID(parent.fontstyle, 1)
 end
 
 local function saveOptions()
 	setThreshold(optionsFrame.threshold:GetText(), false)
+	updateConfig("fontstyle", textFrame:GetFont())
+end
+
+local function cancelOptions()
+	setFontStyle(config.fontstyle)
+	UIDropDownMenu_SetSelectedID(optionsFrame.fontstyle, nil)
+	hideAndLockFrame()
 end
 
 local function createOptionsPanel()
@@ -347,7 +371,7 @@ local function createOptionsPanel()
 	InterfaceOptions_AddCategory(optionsFrame)
 
 	optionsFrame.okay = saveOptions
-	optionsFrame.cancel = hideAndLockFrame
+	optionsFrame.cancel = cancelOptions
 
 	optionsFrame.title = optionsFrame:CreateFontString("DontCastOptionsTitle", "OVERLAY", "GameFontNormalLarge")
 	optionsFrame.title:SetPoint("TOPLEFT", xOffset, -20)
@@ -369,6 +393,7 @@ end
 
 local function updateOptionsUI()
 	optionsFrame.threshold:SetText(config.threshold)
+	fontStyleDropDown_OnLoad()
 end
 
 function loadDontCast(self, text, icon, cdText)

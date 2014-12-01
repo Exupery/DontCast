@@ -3,6 +3,7 @@ DONTCAST CHANGE LOG
 
 v1.2.1
 - integrated with addon options UI
+- added option to change font
 - fixed a bug where `/dontcast center` would have no effect
 
 v1.2
