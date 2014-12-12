@@ -235,20 +235,6 @@ local function onUpdate(self, elapsed)
 	end
 end
 
-local function eventHandler(self, event, unit, ...)
-	if event == "UNIT_AURA" then
-		auraUpdated(self, event, unit)
-	elseif event == "PLAYER_TARGET_CHANGED" then
-		targetChanged(self, event, unit)
-	elseif event == "PLAYER_REGEN_DISABLED" then
-		lockFrame(false)
-	elseif event == "ADDON_LOADED" and unit == "DontCast" then
-		auras = savedAuras()		
-		config = savedConfig()
-		setFontStyle(config.fontstyle)
-	end
-end
-
 local function resized(frame, width, height)
 	local font = textFrame:GetFont()
 	iconFrame:SetSize(height, height)
@@ -317,6 +303,20 @@ local function createDropDown(name, parent)
 	return dropdown
 end
 
+local function createCheckBox(text, parent)
+	local checkbox = CreateFrame("CheckButton", text.."CheckButton", parent, "UICheckButtonTemplate")
+	checkbox:ClearAllPoints()
+	_G[checkbox:GetName().."Text"]:SetText(text)
+	return checkbox
+end
+
+local function createLabel(text, parent, xOffset, yOffset)
+	local textFrame = parent:CreateFontString(text .. "TextFrame", "OVERLAY", "GameFontNormal")
+	textFrame:SetPoint("TOPLEFT", xOffset, yOffset)
+	textFrame:SetText(text)
+	return textFrame
+end
+
 local function drawPositioningOptions(parent, xOffset, yOffset)
 	local unlockButton = createButton("Unlock", parent)
 	local lockButton = createButton("Lock", parent)
@@ -353,6 +353,23 @@ local function drawFontStyleOptions(parent, xOffset, yOffset)
 	UIDropDownMenu_Initialize(parent.fontstyle, fontStyleDropDown_OnLoad)
 end
 
+local function drawAuraOptions(parent, xOffset, yOffset)
+	local y = yOffset
+	for aura, _ in pairs(DontCastAuras) do
+		local checkbox = createCheckBox(aura, parent)
+		checkbox:SetPoint("TOPLEFT", xOffset, y)
+		y = y - 25
+	end
+end
+
+local function drawSoundOptions(parent, xOffset, yOffset)
+	local label = createLabel("Play sound when aura: ", parent, xOffset, yOffset)
+	local beginsCheckbox = createCheckBox("Begins", parent)
+	beginsCheckbox:SetPoint("LEFT", label, "RIGHT", 0, 0)
+	local endsCheckbox = createCheckBox("Ends", parent)
+	endsCheckbox:SetPoint("LEFT", beginsCheckbox, "RIGHT", 50, 0)
+end
+
 local function saveOptions()
 	setThreshold(optionsFrame.threshold:GetText(), false)
 	updateConfig("fontstyle", textFrame:GetFont())
@@ -380,20 +397,27 @@ local function createOptionsPanel()
 	drawPositioningOptions(optionsFrame, xOffset, -50)
 	drawThresholdOptions(optionsFrame, xOffset, -85)
 	drawFontStyleOptions(optionsFrame, xOffset, -125)
-
-	-- TODO add aura
-	-- TODO remove aura
-	-- TODO list/show auras
-	-- TODO revert to default auras
-	-- TODO text color
-	-- TODO toggle sound
-
-	errorPrint("OPTIONS FRAME CREATED") -- TODO DELME
+	drawSoundOptions(optionsFrame, xOffset, -155)
 end
 
 local function updateOptionsUI()
 	optionsFrame.threshold:SetText(config.threshold)
 	fontStyleDropDown_OnLoad()
+end
+
+local function eventHandler(self, event, unit, ...)
+	if event == "UNIT_AURA" then
+		auraUpdated(self, event, unit)
+	elseif event == "PLAYER_TARGET_CHANGED" then
+		targetChanged(self, event, unit)
+	elseif event == "PLAYER_REGEN_DISABLED" then
+		lockFrame(false)
+	elseif event == "ADDON_LOADED" and unit == "DontCast" then
+		auras = savedAuras()		
+		config = savedConfig()
+		createOptionsPanel()
+		setFontStyle(config.fontstyle)
+	end
 end
 
 function loadDontCast(self, text, icon, cdText)
@@ -437,7 +461,6 @@ function loadDontCast(self, text, icon, cdText)
 		eventFrame:SetScript("OnUpdate", onUpdate)
 
 		lockFrame(true)
-		createOptionsPanel()
 		colorPrint("DontCast loaded, for help type /dontcast ?")
 	else
 		errorPrint("Unable to load DontCast!")
