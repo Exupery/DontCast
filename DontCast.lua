@@ -54,7 +54,7 @@ end
 local function defaultConfig()
 	return {
 		threshold = 1.5,
-		fontstyle = "Fonts\\SKURRI.TTF",
+		fontstyle = "Fonts\\skurri.ttf",
 		aurabeginsound = "",
 		auraendsound = ""
 	}
@@ -308,7 +308,7 @@ local function fontStyleDropDownOnLoad()
 	end
 end
 
-local function auraSoundDropDown_OnLoad(soundSelectFunction, frame, setTo)
+local function auraSoundDropDownOnLoad(soundSelectFunction, frame, setTo)
 	local sounds = {
 		None = "",
 		DoubleBell = "AuctionWindowClose",
@@ -406,11 +406,11 @@ local function endSoundSelected(self)
 end
 
 local function beginSoundDropDownOnLoad()
-	auraSoundDropDown_OnLoad(beginSoundSelected, optionsFrame.aurabeginsound, config.aurabeginsound)
+	auraSoundDropDownOnLoad(beginSoundSelected, optionsFrame.aurabeginsound, config.aurabeginsound)
 end
 
 local function endSoundDropDownOnLoad()
-	auraSoundDropDown_OnLoad(endSoundSelected, optionsFrame.auraendsound, config.auraendsound)
+	auraSoundDropDownOnLoad(endSoundSelected, optionsFrame.auraendsound, config.auraendsound)
 end
 
 local function drawSoundOptions(parent, xOffset, yOffset)
@@ -425,6 +425,19 @@ local function drawSoundOptions(parent, xOffset, yOffset)
 	UIDropDownMenu_Initialize(parent.auraendsound, endSoundDropDownOnLoad)
 end
 
+local function updateOptionsUI()
+	optionsFrame.threshold:SetText(config.threshold)
+	fontStyleDropDownOnLoad()
+	beginSoundDropDownOnLoad()
+	endSoundDropDownOnLoad()
+end
+
+local function resetOptionDropdowns()
+	UIDropDownMenu_SetSelectedID(optionsFrame.fontstyle, nil)
+	UIDropDownMenu_SetSelectedID(optionsFrame.aurabeginsound, nil)
+	UIDropDownMenu_SetSelectedID(optionsFrame.auraendsound, nil)
+end
+
 local function saveOptions()
 	setThreshold(optionsFrame.threshold:GetText(), false)
 	updateConfig("fontstyle", textFrame:GetFont())
@@ -434,14 +447,22 @@ end
 
 local function cancelOptions()
 	setFontStyle(config.fontstyle)
-	UIDropDownMenu_SetSelectedID(optionsFrame.fontstyle, nil)
-	UIDropDownMenu_SetSelectedID(optionsFrame.aurabeginsound, nil)
-	UIDropDownMenu_SetSelectedID(optionsFrame.auraendsound, nil)
+	resetOptionDropdowns()
 	hideAndLockFrame()
 end
 
 local function defaultOptions()
-	-- TODO SET DEFAULTS
+	auras = defaultAuras()
+	DontCastAuras = auras
+	config = defaultConfig()
+	DontCastConfig = config
+	setThreshold(config.threshold, false)
+	setFontStyle(config.fontstyle)
+	centerFrame()
+	hideAndLockFrame()
+	resetOptionDropdowns()
+	InterfaceOptionsFrame:Hide()
+	colorPrint("All DontCast options reset to default")
 end
 
 local function createOptionsPanel()
@@ -452,6 +473,7 @@ local function createOptionsPanel()
 
 	optionsFrame.okay = saveOptions
 	optionsFrame.cancel = cancelOptions
+	optionsFrame.default = defaultOptions
 
 	optionsFrame.title = optionsFrame:CreateFontString("DontCastOptionsTitle", "OVERLAY", "GameFontNormalLarge")
 	optionsFrame.title:SetPoint("TOPLEFT", xOffset, -20)
@@ -461,13 +483,6 @@ local function createOptionsPanel()
 	drawThresholdOptions(optionsFrame, xOffset, -90)
 	drawFontStyleOptions(optionsFrame, xOffset, -130)
 	drawSoundOptions(optionsFrame, xOffset, -170)
-end
-
-local function updateOptionsUI()
-	optionsFrame.threshold:SetText(config.threshold)
-	fontStyleDropDownOnLoad()
-	beginSoundDropDownOnLoad()
-	endSoundDropDownOnLoad()
 end
 
 local function eventHandler(self, event, unit, ...)
