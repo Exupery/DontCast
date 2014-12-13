@@ -8,6 +8,7 @@ local cdTextFrame = nil
 local resizeButton = nil
 local auras = {}
 local config = {}
+local tempConfig = {}
 local updCtr = 0
 
 local function colorPrint(msg)
@@ -50,12 +51,22 @@ local function centerFrame()
 	mainFrame:SetPoint("CENTER", UIParent, "CENTER")
 end
 
+local function defaultConfig()
+	return {
+		threshold = 1.5,
+		fontstyle = "Fonts\\SKURRI.TTF",
+		aurabeginsound = "",
+		auraendsound = ""
+	}
+end
+
 local function savedConfig()
 	if not DontCastConfig then
-		DontCastConfig = {
-			threshold = 1.5,
-			fontstyle = "Fonts\\SKURRI.TTF"
-		}
+		DontCastConfig = defaultConfig()
+	end
+	-- if user upgrades to version that introduces new config vars set to default
+	for k, v in pairs(defaultConfig()) do
+		if not DontCastConfig[k] then DontCastConfig[k] = v end
 	end
 	return DontCastConfig
 end
@@ -78,7 +89,7 @@ local function setThreshold(threshold, echo)
 		else
 			errorPrint("Unable to set threshold to "..threshold)
 		end
-	else
+	elseif echo then
 		errorPrint("Threshold NOT changed! Must be set to a number.")
 	end
 end
@@ -275,7 +286,7 @@ local function createDropDownInfo(text, value, func)
 	UIDropDownMenu_AddButton(info)
 end
 
-local function fontStyleDropDown_OnLoad()
+local function fontStyleDropDownOnLoad()
 	local fonts = {
 		Arial = "Fonts\\ARIALN.TTF",
 		FritzQuad = "Fonts\\FRIZQT__.TTF",
@@ -297,6 +308,30 @@ local function fontStyleDropDown_OnLoad()
 	end
 end
 
+local function auraSoundDropDown_OnLoad(soundSelectFunction, frame, setTo)
+	local sounds = {
+		None = "",
+		DoubleBell = "AuctionWindowClose",
+		RaidWarning = "RaidWarning",
+		ReadyCheck = "ReadyCheck",
+		SingleBell = "AuctionWindowOpen"
+	}
+
+	local sorted = {}
+	for k, v in pairs(sounds) do
+		if not (k == "None") then table.insert(sorted, k) end
+	end	
+	table.sort(sorted)
+	table.insert(sorted, 1, "None")
+	for i, k in ipairs(sorted) do
+		createDropDownInfo(k, sounds[k], soundSelectFunction)
+	end
+
+	if not UIDropDownMenu_GetSelectedID(frame) then
+		UIDropDownMenu_SetSelectedValue(frame, setTo)
+	end
+end
+
 local function createDropDown(name, parent)
 	local dropdown = CreateFrame("Button", name.."DropDown", parent, "UIDropDownMenuTemplate")
 	dropdown:ClearAllPoints()
@@ -311,10 +346,10 @@ local function createCheckBox(text, parent)
 end
 
 local function createLabel(text, parent, xOffset, yOffset)
-	local textFrame = parent:CreateFontString(text .. "TextFrame", "OVERLAY", "GameFontNormal")
-	textFrame:SetPoint("TOPLEFT", xOffset, yOffset)
-	textFrame:SetText(text)
-	return textFrame
+	local label = parent:CreateFontString(text .. "Label", "OVERLAY", "GameFontNormal")
+	label:SetPoint("TOPLEFT", xOffset, yOffset)
+	label:SetText(text)
+	return label
 end
 
 local function drawPositioningOptions(parent, xOffset, yOffset)
@@ -334,23 +369,19 @@ local function drawPositioningOptions(parent, xOffset, yOffset)
 end
 
 local function drawThresholdOptions(parent, xOffset, yOffset)
+	local label = createLabel("Expiring soon threshold (seconds)", parent, xOffset, yOffset)
+
 	parent.threshold = createInputBox("threshold", parent)
 	parent.threshold:SetMaxLetters(4)
-	parent.threshold:SetPoint("TOPLEFT", xOffset, yOffset)
-
-	local textFrame = optionsFrame:CreateFontString("DontCastThresholdText", "OVERLAY", "GameFontNormal")
-	textFrame:SetPoint("LEFT", parent.threshold, "RIGHT", 10, 0)
-	textFrame:SetText("Expiring soon threshold (seconds)")
+	parent.threshold:SetPoint("LEFT", label, "RIGHT", 10, 0)
 end
 
 local function drawFontStyleOptions(parent, xOffset, yOffset)
-	local textFrame = parent:CreateFontString("DontCastFontStyleText", "OVERLAY", "GameFontNormal")
-	textFrame:SetPoint("TOPLEFT", xOffset, yOffset)
-	textFrame:SetText("Font")
+	local label = createLabel("Font", parent, xOffset, yOffset)
 
 	parent.fontstyle = createDropDown("DontCastFontStyle", parent)
-	parent.fontstyle:SetPoint("LEFT", textFrame, "RIGHT", 0, 0)
-	UIDropDownMenu_Initialize(parent.fontstyle, fontStyleDropDown_OnLoad)
+	parent.fontstyle:SetPoint("LEFT", label, "RIGHT", 0, 0)
+	UIDropDownMenu_Initialize(parent.fontstyle, fontStyleDropDownOnLoad)
 end
 
 local function drawAuraOptions(parent, xOffset, yOffset)
@@ -362,23 +393,55 @@ local function drawAuraOptions(parent, xOffset, yOffset)
 	end
 end
 
+local function beginSoundSelected(self)
+	PlaySound(self.value, "Master")
+	tempConfig.aurabeginsound = self.value
+	UIDropDownMenu_SetSelectedID(optionsFrame.aurabeginsound, self:GetID())
+end
+
+local function endSoundSelected(self)
+	PlaySound(self.value, "Master")
+	tempConfig.auraendsound = self.value
+	UIDropDownMenu_SetSelectedID(optionsFrame.auraendsound, self:GetID())
+end
+
+local function beginSoundDropDownOnLoad()
+	auraSoundDropDown_OnLoad(beginSoundSelected, optionsFrame.aurabeginsound, config.aurabeginsound)
+end
+
+local function endSoundDropDownOnLoad()
+	auraSoundDropDown_OnLoad(endSoundSelected, optionsFrame.auraendsound, config.auraendsound)
+end
+
 local function drawSoundOptions(parent, xOffset, yOffset)
-	local label = createLabel("Play sound when aura: ", parent, xOffset, yOffset)
-	local beginsCheckbox = createCheckBox("Begins", parent)
-	beginsCheckbox:SetPoint("LEFT", label, "RIGHT", 0, 0)
-	local endsCheckbox = createCheckBox("Ends", parent)
-	endsCheckbox:SetPoint("LEFT", beginsCheckbox, "RIGHT", 50, 0)
+	local beginLabel = createLabel("Aura begins sound", parent, xOffset, yOffset)
+	parent.aurabeginsound = createDropDown("AuraBeginSound", parent)
+	parent.aurabeginsound:SetPoint("LEFT", beginLabel, "RIGHT", 0, 0)
+	UIDropDownMenu_Initialize(parent.aurabeginsound, beginSoundDropDownOnLoad)
+
+	local endLabel = createLabel("Aura ends sound", parent, xOffset, yOffset - 40)
+	parent.auraendsound = createDropDown("AuraEndSound", parent)
+	parent.auraendsound:SetPoint("LEFT", endLabel, "RIGHT", 0, 0)
+	UIDropDownMenu_Initialize(parent.auraendsound, endSoundDropDownOnLoad)
 end
 
 local function saveOptions()
 	setThreshold(optionsFrame.threshold:GetText(), false)
 	updateConfig("fontstyle", textFrame:GetFont())
+	updateConfig("aurabeginsound", tempConfig.aurabeginsound)
+	updateConfig("auraendsound", tempConfig.auraendsound)
 end
 
 local function cancelOptions()
 	setFontStyle(config.fontstyle)
 	UIDropDownMenu_SetSelectedID(optionsFrame.fontstyle, nil)
+	UIDropDownMenu_SetSelectedID(optionsFrame.aurabeginsound, nil)
+	UIDropDownMenu_SetSelectedID(optionsFrame.auraendsound, nil)
 	hideAndLockFrame()
+end
+
+local function defaultOptions()
+	-- TODO SET DEFAULTS
 end
 
 local function createOptionsPanel()
@@ -395,14 +458,16 @@ local function createOptionsPanel()
 	optionsFrame.title:SetText("DontCast Options")
 
 	drawPositioningOptions(optionsFrame, xOffset, -50)
-	drawThresholdOptions(optionsFrame, xOffset, -85)
-	drawFontStyleOptions(optionsFrame, xOffset, -125)
-	drawSoundOptions(optionsFrame, xOffset, -155)
+	drawThresholdOptions(optionsFrame, xOffset, -90)
+	drawFontStyleOptions(optionsFrame, xOffset, -130)
+	drawSoundOptions(optionsFrame, xOffset, -170)
 end
 
 local function updateOptionsUI()
 	optionsFrame.threshold:SetText(config.threshold)
-	fontStyleDropDown_OnLoad()
+	fontStyleDropDownOnLoad()
+	beginSoundDropDownOnLoad()
+	endSoundDropDownOnLoad()
 end
 
 local function eventHandler(self, event, unit, ...)

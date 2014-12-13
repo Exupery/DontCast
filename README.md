@@ -31,6 +31,5 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 ## TODOs
 * customizable text colors
 * add (optional) sound on aura up/down
-* allow selecting of sound played on aura up/down
 * integrate adding/removing auras via options UI
 * set expiring soon threshold to a provided spell's cast-time
