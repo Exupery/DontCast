@@ -9,6 +9,7 @@ local resizeButton = nil
 local auras = {}
 local config = {}
 local tempConfig = {}
+local upAuras = {}
 local updCtr = 0
 
 local function colorPrint(msg)
@@ -66,7 +67,7 @@ local function savedConfig()
 	end
 	-- if user upgrades to version that introduces new config vars set to default
 	for k, v in pairs(defaultConfig()) do
-		if not DontCastConfig[k] then DontCastConfig[k] = v end
+		if DontCastConfig[k] == nil then DontCastConfig[k] = v end
 	end
 	return DontCastConfig
 end
@@ -211,17 +212,28 @@ local function auraUpdated(self, event, unit, ...)
 			if name and isValid(name) then
 				textFrame:SetText(name)
 				iconFrame:SetTexture(icon)
+				if not mainFrame:IsShown() and config.aurabeginsound ~= "" then
+					PlaySound(config.aurabeginsound, "Master")
+				end
 				mainFrame:Show()
 				hasAura = true
+				upAuras[name] = true
 			end
 		end
 		if not hasAura then
+			if next(upAuras) ~= nil then
+				if config.auraendsound ~= "" then
+					PlaySound(config.auraendsound, "Master")
+				end
+				upAuras = {}
+			end
 			hideIfNotInConfig()
 		end
 	end
 end
 
 local function targetChanged(self, event, unit, ...)
+	upAuras = {}
 	if targetIsHostile() then
 		auraUpdated(self, event, "target")
 	else
