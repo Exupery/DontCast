@@ -315,9 +315,7 @@ local function fontStyleDropDownOnLoad()
 		createDropDownInfo(k, fonts[k], fontStyleSelected)
 	end
 
-	if not UIDropDownMenu_GetSelectedID(optionsFrame.fontstyle) then
-		UIDropDownMenu_SetSelectedValue(optionsFrame.fontstyle, config.fontstyle)
-	end
+	UIDropDownMenu_SetSelectedValue(optionsFrame.fontstyle, config.fontstyle)
 end
 
 local function auraSoundDropDownOnLoad(soundSelectFunction, frame, setTo)
@@ -331,7 +329,7 @@ local function auraSoundDropDownOnLoad(soundSelectFunction, frame, setTo)
 
 	local sorted = {}
 	for k, v in pairs(sounds) do
-		if not (k == "None") then table.insert(sorted, k) end
+		if k ~= "None" then table.insert(sorted, k) end
 	end	
 	table.sort(sorted)
 	table.insert(sorted, 1, "None")
@@ -339,9 +337,7 @@ local function auraSoundDropDownOnLoad(soundSelectFunction, frame, setTo)
 		createDropDownInfo(k, sounds[k], soundSelectFunction)
 	end
 
-	if not UIDropDownMenu_GetSelectedID(frame) then
-		UIDropDownMenu_SetSelectedValue(frame, setTo)
-	end
+	UIDropDownMenu_SetSelectedValue(frame, setTo)
 end
 
 local function createDropDown(name, parent)
@@ -444,22 +440,20 @@ local function updateOptionsUI()
 	endSoundDropDownOnLoad()
 end
 
-local function resetOptionDropdowns()
-	UIDropDownMenu_SetSelectedID(optionsFrame.fontstyle, nil)
-	UIDropDownMenu_SetSelectedID(optionsFrame.aurabeginsound, nil)
-	UIDropDownMenu_SetSelectedID(optionsFrame.auraendsound, nil)
-end
-
 local function saveOptions()
 	setThreshold(optionsFrame.threshold:GetText(), false)
 	updateConfig("fontstyle", textFrame:GetFont())
-	updateConfig("aurabeginsound", tempConfig.aurabeginsound)
-	updateConfig("auraendsound", tempConfig.auraendsound)
+
+	if tempConfig.aurabeginsound ~= nil then
+		updateConfig("aurabeginsound", tempConfig.aurabeginsound)
+	end
+	if tempConfig.auraendsound ~= nil then
+		updateConfig("auraendsound", tempConfig.auraendsound)
+	end
 end
 
 local function cancelOptions()
 	setFontStyle(config.fontstyle)
-	resetOptionDropdowns()
 	hideAndLockFrame()
 end
 
@@ -472,7 +466,6 @@ local function defaultOptions()
 	setFontStyle(config.fontstyle)
 	centerFrame()
 	hideAndLockFrame()
-	resetOptionDropdowns()
 	InterfaceOptionsFrame:Hide()
 	colorPrint("All DontCast options reset to default")
 end
