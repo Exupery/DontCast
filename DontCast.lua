@@ -81,20 +81,6 @@ local function updateConfig(key, value)
 	return updated
 end
 
-local function setThreshold(threshold, echo)
-	local asNum = tonumber(threshold)
-	if type(asNum) == "number" then
-		local updated = updateConfig("threshold", asNum)
-		if updated then
-			if echo then colorPrint("Threshold set to "..threshold) end
-		else
-			errorPrint("Unable to set threshold to "..threshold)
-		end
-	elseif echo then
-		errorPrint("Threshold NOT changed! Must be set to a number.")
-	end
-end
-
 local function setFontStyle(style)
 	cdTextFrame:SetFont(style, mainFrame:GetHeight() * 0.95)
 	textFrame:SetFont(style, mainFrame:GetHeight() * 0.75)
@@ -272,7 +258,7 @@ local function fontStyleSelected(self)
 end
 
 local function createButton(text, parent)
-	local button = CreateFrame("Button", text.."Button", parent, "UIPanelButtonTemplate")
+	local button = CreateFrame("Button", "DontCast"..text.."Button", parent, "UIPanelButtonTemplate")
 	button:SetHeight(20)
 	button:SetWidth(100)
 	button:SetText(text)
@@ -280,12 +266,18 @@ local function createButton(text, parent)
 	return button
 end
 
-local function createInputBox(name, parent)
-	local box = CreateFrame("EditBox", name.."EditBox", parent, "InputBoxTemplate")
+local function setInputBoxText(inputBox, text)
+	inputBox:SetText(text)
+	inputBox:SetCursorPosition(0)
+end
+
+local function createInputBox(name, parent, defaultText)
+	local box = CreateFrame("EditBox", "DontCast"..name.."EditBox", parent, "InputBoxTemplate")
 	box:SetHeight(20)
 	box:SetWidth(35)
 	box:SetAutoFocus(false)
 	box:ClearAllPoints()
+	setInputBoxText(box, defaultText)
 	return box
 end
 
@@ -379,7 +371,7 @@ end
 local function drawThresholdOptions(parent, xOffset, yOffset)
 	local label = createLabel("Expiring soon threshold (seconds)", parent, xOffset, yOffset)
 
-	parent.threshold = createInputBox("threshold", parent)
+	parent.threshold = createInputBox("threshold", parent, config.threshold)
 	parent.threshold:SetMaxLetters(4)
 	parent.threshold:SetPoint("LEFT", label, "RIGHT", 10, 0)
 end
@@ -434,10 +426,25 @@ local function drawSoundOptions(parent, xOffset, yOffset)
 end
 
 local function updateOptionsUI()
-	optionsFrame.threshold:SetText(config.threshold)
+	setInputBoxText(optionsFrame.threshold, config.threshold)
 	fontStyleDropDownOnLoad()
 	beginSoundDropDownOnLoad()
 	endSoundDropDownOnLoad()
+end
+
+local function setThreshold(threshold, echo)
+	local asNum = tonumber(threshold)
+	if type(asNum) == "number" then
+		local updated = updateConfig("threshold", asNum)
+		if updated then
+			if echo then colorPrint("Threshold set to "..threshold) end
+			setInputBoxText(optionsFrame.threshold, threshold)
+		else
+			errorPrint("Unable to set threshold to "..threshold)
+		end
+	elseif echo then
+		errorPrint("Threshold NOT changed! Must be set to a number.")
+	end
 end
 
 local function saveOptions()
@@ -488,6 +495,8 @@ local function createOptionsPanel()
 	drawThresholdOptions(optionsFrame, xOffset, -90)
 	drawFontStyleOptions(optionsFrame, xOffset, -130)
 	drawSoundOptions(optionsFrame, xOffset, -170)
+
+	updateOptionsUI()
 end
 
 local function eventHandler(self, event, unit, ...)
