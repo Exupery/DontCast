@@ -406,11 +406,13 @@ local function endSoundSelected(self)
 end
 
 local function beginSoundDropDownOnLoad()
-	auraSoundDropDownOnLoad(beginSoundSelected, optionsFrame.aurabeginsound, config.aurabeginsound)
+	local selected = tempConfig.aurabeginsound ~= nil and tempConfig.aurabeginsound or config.aurabeginsound
+	auraSoundDropDownOnLoad(beginSoundSelected, optionsFrame.aurabeginsound, selected)
 end
 
 local function endSoundDropDownOnLoad()
-	auraSoundDropDownOnLoad(endSoundSelected, optionsFrame.auraendsound, config.auraendsound)
+	local selected = tempConfig.auraendsound ~= nil and tempConfig.auraendsound or config.auraendsound
+	auraSoundDropDownOnLoad(endSoundSelected, optionsFrame.auraendsound, selected)
 end
 
 local function drawSoundOptions(parent, xOffset, yOffset)
@@ -447,6 +449,10 @@ local function setThreshold(threshold, echo)
 	end
 end
 
+local function resetTempConfig()
+	tempConfig = {}
+end
+
 local function saveOptions()
 	setThreshold(optionsFrame.threshold:GetText(), false)
 	updateConfig("fontstyle", textFrame:GetFont())
@@ -457,9 +463,11 @@ local function saveOptions()
 	if tempConfig.auraendsound ~= nil then
 		updateConfig("auraendsound", tempConfig.auraendsound)
 	end
+	resetTempConfig()
 end
 
 local function cancelOptions()
+	resetTempConfig()
 	setFontStyle(config.fontstyle)
 	hideAndLockFrame()
 end
@@ -474,6 +482,7 @@ local function defaultOptions()
 	centerFrame()
 	hideAndLockFrame()
 	InterfaceOptionsFrame:Hide()
+	resetTempConfig()
 	colorPrint("All DontCast options reset to default")
 end
 

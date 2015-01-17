@@ -3,6 +3,7 @@ DONTCAST CHANGE LOG
 
 v1.3.2
 - reduced potential frame name conflicts with other addons
+- fixed bug where opening the sound select dropdowns wouldn't show the last selected entry
 
 v1.3.1
 - resolved bug where options UI didn't show correct threshold value if set via command line
