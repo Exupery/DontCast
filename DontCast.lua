@@ -87,19 +87,26 @@ local function setFontStyle(style)
 end
 
 local function defaultAuras()
-	return {
-			["Anti-Magic Shell"] = true,
-			["Cloak of Shadows"] = true,
-			["Cyclone"] = true,
-			["Deterrence"] = true,
-			["Diffuse Magic"] = true,
-			["Dispersion"] = true,
-			["Divine Shield"] = true,
-			["Ice Block"] = true,
-			["Smoke Bomb"] = true,
-			["Spell Reflection"] = true,
-			["Touch of Karma"] = true
-		}
+	local spellIds = {
+		48707,	-- Anti-Magic Shell
+		31224,	-- Cloak of Shadows
+		33786,	-- Cyclone
+		19263,	-- Deterrence
+		122783,	-- Diffuse Magic
+		47585,	-- Dispersion
+		642,	-- Divine Shield
+		45438,	-- Ice Block
+		76577,	-- Smoke Bomb
+		23920,	-- Spell Reflection
+		122470	-- Touch of Karma
+	}
+
+	local names = {}
+	for _, id in ipairs(spellIds) do
+		local name = GetSpellInfo(id)
+		names[name] = true
+	end
+	return names
 end
 
 local function savedAuras()
@@ -159,25 +166,18 @@ local function displayCountdown(duration)
 	cdTextFrame:SetText(txt)
 end
 
-local function validSmoke()
-	--only concerned with Smoke Bomb when player NOT also in smoke
-	local targetInSmoke = UnitDebuff("target", "Smoke Bomb")
-	local playerInSmoke = UnitDebuff("player", "Smoke Bomb")
-	return (targetInSmoke and not playerInSmoke) or (not targetInSmoke and playerInSmoke)
-end
-
-local function validKarma()
-	--only display ToK for buffed Monk, not the recipient
-	local name = UnitBuff("target", "Touch of Karma")
-	local _, classFileName = UnitClass("target")
-	return name and classFileName == "MONK"
-end
-
 local function isValid(name)
-	if (name == "Smoke Bomb") then
-		return validSmoke()
-	elseif (name == "Touch of Karma") then
-		return validKarma()
+	local localalizedSmokeBomb = GetSpellInfo(76577)
+	local localalizedTouchOfKarma = GetSpellInfo(122470)
+	if (name == localalizedSmokeBomb) then
+		--only concerned with Smoke Bomb when player NOT also in smoke
+		local targetInSmoke = UnitDebuff("target", localalizedSmokeBomb)
+		local playerInSmoke = UnitDebuff("player", localalizedSmokeBomb)
+		return (targetInSmoke and not playerInSmoke) or (not targetInSmoke and playerInSmoke)
+	elseif (name == localalizedTouchOfKarma) then
+		--only display ToK for buffed Monk, not the recipient
+		local _, _, _, _, _, _, _, caster = UnitBuff("target", localalizedTouchOfKarma)
+		return caster == "target"
 	else
 		return true
 	end

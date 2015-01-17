@@ -2,6 +2,8 @@ DONTCAST CHANGE LOG
 ===================
 
 v1.3.2
+- populate default auras using SpellID so non-US clients will use the localized aura names
+- use localized versions of Smoke Bomb and Touch of Karma in validity checks
 - reduced potential frame name conflicts with other addons
 - fixed bug where opening the sound select dropdowns wouldn't show the last selected entry
 
