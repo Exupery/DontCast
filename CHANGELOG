@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.3.2
+- reduced potential frame name conflicts with other addons
+
 v1.3.1
 - resolved bug where options UI didn't show correct threshold value if set via command line
 

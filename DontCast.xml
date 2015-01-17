@@ -4,7 +4,7 @@
  		<Size x="300" y="50"/>
 		<Scripts>
 			<OnLoad>
-				loadDontCast(self, SpellText, SpellIcon, CountdownText)
+				loadDontCast(self, DontCastSpellText, DontCastSpellIcon, DontCastCountdownText)
 			</OnLoad>
 		</Scripts>
 		<Anchors>
@@ -17,7 +17,7 @@
 				<Texture setAllPoints="true">
 					<Color r="0.7" g="0.4" b="0.65" a="0" />
 				</Texture>
-				<FontString name="SpellText" font="Fonts\SKURRI.TTF" justifyH="LEFT" justifyV="MIDDLE" text="">
+				<FontString name="DontCastSpellText" font="Fonts\SKURRI.TTF" justifyH="LEFT" justifyV="MIDDLE" text="">
 					<Color r="1" g="1" b="0.1" a="0.9" />
 					<RelDimension x="0.75" y="1.0"/>
 					<Shadow>
@@ -35,7 +35,7 @@
 				</FontString>
 			</Layer>
 			<Layer level="ARTWORK">
-				<Texture name="SpellIcon" urgency="5" file="Interface\ICONS\INV_Misc_QuestionMark">
+				<Texture name="DontCastSpellIcon" urgency="5" file="Interface\ICONS\INV_Misc_QuestionMark">
 					<Size x="45" y="45"/>
 					<Anchors>
 						<Anchor point="LEFT">
@@ -43,7 +43,7 @@
 						</Anchor>
 					</Anchors>
 				</Texture>
-				<FontString name="CountdownText" font="Fonts\SKURRI.TTF" justifyH="CENTER" justifyV="MIDDLE" text="">
+				<FontString name="DontCastCountdownText" font="Fonts\SKURRI.TTF" justifyH="CENTER" justifyV="MIDDLE" text="">
 					<Color r="1" g="1" b=".1" a="0.85" />
 					<Size x="45" y="45"/>
 					<Shadow>
@@ -54,7 +54,7 @@
 				      	<AbsValue val="40"/>
 				    </FontHeight>
 					<Anchors>
-						<Anchor point="CENTER" relativeTo="SpellIcon">
+						<Anchor point="CENTER" relativeTo="DontCastSpellIcon">
 							<Offset x="0" y="0" />
 						</Anchor>
 					</Anchors>

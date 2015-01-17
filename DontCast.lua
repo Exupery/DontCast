@@ -333,20 +333,20 @@ local function auraSoundDropDownOnLoad(soundSelectFunction, frame, setTo)
 end
 
 local function createDropDown(name, parent)
-	local dropdown = CreateFrame("Button", name.."DropDown", parent, "UIDropDownMenuTemplate")
+	local dropdown = CreateFrame("Button", "DontCast"..name.."DropDown", parent, "UIDropDownMenuTemplate")
 	dropdown:ClearAllPoints()
 	return dropdown
 end
 
 local function createCheckBox(text, parent)
-	local checkbox = CreateFrame("CheckButton", text.."CheckButton", parent, "UICheckButtonTemplate")
+	local checkbox = CreateFrame("CheckButton", "DontCast"..text.."CheckButton", parent, "UICheckButtonTemplate")
 	checkbox:ClearAllPoints()
 	_G[checkbox:GetName().."Text"]:SetText(text)
 	return checkbox
 end
 
 local function createLabel(text, parent, xOffset, yOffset)
-	local label = parent:CreateFontString(text .. "Label", "OVERLAY", "GameFontNormal")
+	local label = parent:CreateFontString("DontCast"..text.."Label", "OVERLAY", "GameFontNormal")
 	label:SetPoint("TOPLEFT", xOffset, yOffset)
 	label:SetText(text)
 	return label
@@ -479,7 +479,7 @@ end
 
 local function createOptionsPanel()
 	local xOffset = 20
-	optionsFrame = CreateFrame("Frame", "Options", UIParent)
+	optionsFrame = CreateFrame("Frame", "DontCastOptions", UIParent)
 	optionsFrame.name = "DontCast"
 	InterfaceOptions_AddCategory(optionsFrame)
 
@@ -528,7 +528,7 @@ function loadDontCast(self, text, icon, cdText)
 		mainFrame:SetMaxResize(512, 256)
 		mainFrame:SetScript("OnSizeChanged", resized)
 
-		resizeButton = CreateFrame("Button", nil, mainFrame)
+		resizeButton = CreateFrame("Button", "DontCastResizeFrame", mainFrame)
 		resizeButton:SetSize(16, 16)
 		resizeButton:SetPoint("BOTTOMRIGHT")
 		resizeButton:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
@@ -546,7 +546,7 @@ function loadDontCast(self, text, icon, cdText)
 		iconFrame = icon
 		cdTextFrame = cdText
 
-		local eventFrame = CreateFrame("Frame", "eventFrame", UIParent)
+		local eventFrame = CreateFrame("Frame", "DontCastEventFrame", UIParent)
 		eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
 		eventFrame:RegisterEvent("ADDON_LOADED")
 		eventFrame:RegisterEvent("UNIT_AURA")
