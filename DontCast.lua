@@ -254,7 +254,8 @@ end
 
 local function fontStyleSelected(self)
 	setFontStyle(self.value)
-	UIDropDownMenu_SetSelectedID(optionsFrame.fontstyle, self:GetID())
+	tempConfig.fontstyle = self.value
+	Lib_UIDropDownMenu_SetSelectedID(optionsFrame.fontstyle, self:GetID())
 end
 
 local function createButton(text, parent)
@@ -282,15 +283,15 @@ local function createInputBox(name, parent, defaultText)
 end
 
 local function createDropDownInfo(text, value, func)
-	local info = UIDropDownMenu_CreateInfo()
+	local info = Lib_UIDropDownMenu_CreateInfo()
 	info.text = text
 	info.value = value
 	info.func = func
 
-	UIDropDownMenu_AddButton(info)
+	Lib_UIDropDownMenu_AddButton(info)
 end
 
-local function fontStyleDropDownOnLoad()
+local function fontStyleDropDownOnLoad(frame, level, menuList)
 	local fonts = {
 		Arial = "Fonts\\ARIALN.TTF",
 		FritzQuad = "Fonts\\FRIZQT__.TTF",
@@ -307,7 +308,8 @@ local function fontStyleDropDownOnLoad()
 		createDropDownInfo(k, fonts[k], fontStyleSelected)
 	end
 
-	UIDropDownMenu_SetSelectedValue(optionsFrame.fontstyle, config.fontstyle)
+	local selected = tempConfig.fontstyle ~= nil and tempConfig.fontstyle or config.fontstyle
+	Lib_UIDropDownMenu_SetSelectedValue(optionsFrame.fontstyle, selected)
 end
 
 local function auraSoundDropDownOnLoad(soundSelectFunction, frame, setTo)
@@ -329,11 +331,11 @@ local function auraSoundDropDownOnLoad(soundSelectFunction, frame, setTo)
 		createDropDownInfo(k, sounds[k], soundSelectFunction)
 	end
 
-	UIDropDownMenu_SetSelectedValue(frame, setTo)
+	Lib_UIDropDownMenu_SetSelectedValue(frame, setTo)
 end
 
 local function createDropDown(name, parent)
-	local dropdown = CreateFrame("Button", "DontCast"..name.."DropDown", parent, "UIDropDownMenuTemplate")
+	local dropdown = CreateFrame("Button", "DontCast"..name.."DropDown", parent, "Lib_UIDropDownMenuTemplate")
 	dropdown:ClearAllPoints()
 	return dropdown
 end
@@ -381,7 +383,7 @@ local function drawFontStyleOptions(parent, xOffset, yOffset)
 
 	parent.fontstyle = createDropDown("DontCastFontStyle", parent)
 	parent.fontstyle:SetPoint("LEFT", label, "RIGHT", 0, 0)
-	UIDropDownMenu_Initialize(parent.fontstyle, fontStyleDropDownOnLoad)
+	Lib_UIDropDownMenu_Initialize(parent.fontstyle, fontStyleDropDownOnLoad)
 end
 
 local function drawAuraOptions(parent, xOffset, yOffset)
@@ -396,13 +398,13 @@ end
 local function beginSoundSelected(self)
 	PlaySound(self.value, "Master")
 	tempConfig.aurabeginsound = self.value
-	UIDropDownMenu_SetSelectedID(optionsFrame.aurabeginsound, self:GetID())
+	Lib_UIDropDownMenu_SetSelectedID(optionsFrame.aurabeginsound, self:GetID())
 end
 
 local function endSoundSelected(self)
 	PlaySound(self.value, "Master")
 	tempConfig.auraendsound = self.value
-	UIDropDownMenu_SetSelectedID(optionsFrame.auraendsound, self:GetID())
+	Lib_UIDropDownMenu_SetSelectedID(optionsFrame.auraendsound, self:GetID())
 end
 
 local function beginSoundDropDownOnLoad()
@@ -419,12 +421,12 @@ local function drawSoundOptions(parent, xOffset, yOffset)
 	local beginLabel = createLabel("Aura begins sound", parent, xOffset, yOffset)
 	parent.aurabeginsound = createDropDown("AuraBeginSound", parent)
 	parent.aurabeginsound:SetPoint("LEFT", beginLabel, "RIGHT", 0, 0)
-	UIDropDownMenu_Initialize(parent.aurabeginsound, beginSoundDropDownOnLoad)
+	Lib_UIDropDownMenu_Initialize(parent.aurabeginsound, beginSoundDropDownOnLoad)
 
 	local endLabel = createLabel("Aura ends sound", parent, xOffset, yOffset - 40)
 	parent.auraendsound = createDropDown("AuraEndSound", parent)
 	parent.auraendsound:SetPoint("LEFT", endLabel, "RIGHT", 0, 0)
-	UIDropDownMenu_Initialize(parent.auraendsound, endSoundDropDownOnLoad)
+	Lib_UIDropDownMenu_Initialize(parent.auraendsound, endSoundDropDownOnLoad)
 end
 
 local function updateOptionsUI()

@@ -1,6 +1,10 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.3.3
+- use NoTaintUIDropDownMenu library (this resolves an issue where some players were unable to queue for battlegrounds due to taint errors)
+- fixed bug where opening the font dropdown wouldn't show the last selected entry
+
 v1.3.2
 - populate default auras using SpellID so non-US clients will use the localized aura names
 - use localized versions of Smoke Bomb and Touch of Karma in validity checks
