@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.3.4
+- updated interface version for 6.1
+
 v1.3.3
 - use NoTaintUIDropDownMenu library (this resolves an issue where some players were unable to queue for battlegrounds due to taint errors)
 - fixed bug where opening the font dropdown wouldn't show the last selected entry
