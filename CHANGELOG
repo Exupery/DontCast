@@ -1,6 +1,10 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.3.6
+- updated interface version for 7.0
+- made cooldown text slightly smaller
+
 v1.3.5
 - updated interface version for 6.2
 

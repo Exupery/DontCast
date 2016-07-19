@@ -1,8 +1,8 @@
-## Interface: 60200
+## Interface: 70000
 ## Title: DontCast
 ## Notes: Warns when target is immune to casts
 ## Author: Exupery - Tichondrius
-## Version: 1.3.5
+## Version: 1.3.6
 ## SavedVariables: DontCastAuras, DontCastConfig
 
 embeds.xml

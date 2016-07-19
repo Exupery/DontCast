@@ -82,7 +82,7 @@ local function updateConfig(key, value)
 end
 
 local function setFontStyle(style)
-	cdTextFrame:SetFont(style, mainFrame:GetHeight() * 0.95)
+	cdTextFrame:SetFont(style, mainFrame:GetHeight() * 0.6)
 	textFrame:SetFont(style, mainFrame:GetHeight() * 0.75)
 end
 
@@ -302,7 +302,7 @@ local function fontStyleDropDownOnLoad(frame, level, menuList)
 	local sorted = {}
 	for k, v in pairs(fonts) do
 		table.insert(sorted, k)
-	end	
+	end
 	table.sort(sorted)
 	for i, k in ipairs(sorted) do
 		createDropDownInfo(k, fonts[k], fontStyleSelected)
@@ -324,7 +324,7 @@ local function auraSoundDropDownOnLoad(soundSelectFunction, frame, setTo)
 	local sorted = {}
 	for k, v in pairs(sounds) do
 		if k ~= "None" then table.insert(sorted, k) end
-	end	
+	end
 	table.sort(sorted)
 	table.insert(sorted, 1, "None")
 	for i, k in ipairs(sorted) do
@@ -518,7 +518,7 @@ local function eventHandler(self, event, unit, ...)
 	elseif event == "PLAYER_REGEN_DISABLED" then
 		lockFrame(false)
 	elseif event == "ADDON_LOADED" and unit == "DontCast" then
-		auras = savedAuras()		
+		auras = savedAuras()
 		config = savedConfig()
 		createOptionsPanel()
 		setFontStyle(config.fontstyle)
