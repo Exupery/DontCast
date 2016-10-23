@@ -94,11 +94,12 @@ local function defaultAuras()
 		19263,	-- Deterrence
 		122783,	-- Diffuse Magic
 		47585,	-- Dispersion
-		642,	-- Divine Shield
+		642,	  -- Divine Shield
 		45438,	-- Ice Block
 		76577,	-- Smoke Bomb
 		23920,	-- Spell Reflection
-		122470	-- Touch of Karma
+		122470,	-- Touch of Karma
+		186265, -- Aspect of the Turtle
 	}
 
 	local names = {}

@@ -14,6 +14,7 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 * Smoke Bomb
 * Spell Reflection
 * Touch of Karma
+* Aspect of the Turtle
 
 ## Commands
 * /dontcast add NAME - adds the named buff or debuff
