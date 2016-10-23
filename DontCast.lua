@@ -128,8 +128,8 @@ local function addAura(aura)
 end
 
 local function removeAura(aura)
-	DontCastAuras[aura] = nil
-	if DontCastAuras[aura] == nil then
+	DontCastAuras[aura] = false
+	if not DontCastAuras[aura] then
 		auras = savedAuras()
 		colorPrint("Removed "..aura)
 	else
@@ -137,10 +137,16 @@ local function removeAura(aura)
 	end
 end
 
+local function addNewDefaults()
+  for aura, _ in pairs(defaultAuras()) do
+    if DontCastAuras[aura] == nil then addAura(aura) end
+  end
+end
+
 local function displayAuras()
 	colorPrint("DontCast is triggered by the following:")
 	for aura, _ in pairs(DontCastAuras) do
-		print(aura)
+    if DontCastAuras[aura] then print(aura) end
 	end
 end
 
@@ -168,6 +174,10 @@ local function displayCountdown(duration)
 end
 
 local function isValid(name)
+  if DontCastAuras[name] == nil or DontCastAuras[name] == false then
+    return false
+  end
+
 	local localalizedSmokeBomb = GetSpellInfo(76577)
 	local localalizedTouchOfKarma = GetSpellInfo(122470)
 	if (name == localalizedSmokeBomb) then
@@ -519,6 +529,7 @@ local function eventHandler(self, event, unit, ...)
 	elseif event == "PLAYER_REGEN_DISABLED" then
 		lockFrame(false)
 	elseif event == "ADDON_LOADED" and unit == "DontCast" then
+    addNewDefaults()
 		auras = savedAuras()
 		config = savedConfig()
 		createOptionsPanel()
