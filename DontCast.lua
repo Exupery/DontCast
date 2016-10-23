@@ -248,7 +248,7 @@ end
 local function resized(frame, width, height)
 	local font = textFrame:GetFont()
 	iconFrame:SetSize(height, height)
-	cdTextFrame:SetFont(font, height * 0.95)
+	cdTextFrame:SetFont(font, height * 0.65)
 	textFrame:SetFont(font, height * 0.75)
 	textFrame:SetPoint("LEFT", height * 1.1, 0)
 end
