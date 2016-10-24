@@ -1,66 +1,65 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
- 	<Script File="DontCast.lua"/>
- 	<Frame name="DontCastUI" parent="UIParent" enablekeyboard="true">
- 		<Size x="300" y="50"/>
-		<Scripts>
-			<OnLoad>
-				loadDontCast(self, DontCastSpellText, DontCastSpellIcon, DontCastCountdownText)
-			</OnLoad>
-		</Scripts>
-		<Anchors>
-			<Anchor point="CENTER">
-			</Anchor>
-		</Anchors>
+  <Script File="DontCast.lua"/>
+  <Frame name="DontCastUI" parent="UIParent" enablekeyboard="true">
+    <Size x="300" y="50"/>
+  <Scripts>
+    <OnLoad>
+      loadDontCast(self, DontCastSpellText, DontCastSpellIcon, DontCastCountdownText)
+    </OnLoad>
+  </Scripts>
+  <Anchors>
+    <Anchor point="CENTER">
+    </Anchor>
+  </Anchors>
 
-		<Layers>
-			<Layer level="ARTWORK">
-				<Texture setAllPoints="true">
-					<Color r="0.7" g="0.4" b="0.65" a="0" />
-				</Texture>
-				<FontString name="DontCastSpellText" font="Fonts\SKURRI.TTF" justifyH="LEFT" justifyV="MIDDLE" text="">
-					<Color r="1" g="1" b="0.1" a="0.9" />
-					<RelDimension x="0.75" y="1.0"/>
-					<Shadow>
-          				<Color r="0.1" g="0.1" b="0.1" a="0.9"/>
-          				<Offset x="2" y="-2"/>
-        			</Shadow>
-					<FontHeight>
-				      	<AbsValue val="30"/>
-				    </FontHeight>
-					<Anchors>
-						<Anchor point="LEFT">
-							<Offset x="50" y="0" />
-						</Anchor>
-					</Anchors>
-				</FontString>
-			</Layer>
-			<Layer level="ARTWORK">
-				<Texture name="DontCastSpellIcon" urgency="5" file="Interface\ICONS\INV_Misc_QuestionMark">
-					<Size x="45" y="45"/>
-					<Anchors>
-						<Anchor point="LEFT">
-							<Offset x="0" y="0" />
-						</Anchor>
-					</Anchors>
-				</Texture>
-				<FontString name="DontCastCountdownText" font="Fonts\SKURRI.TTF" justifyH="CENTER" justifyV="MIDDLE" text="">
-					<Color r="1" g="1" b=".1" a="0.85" />
-					<Size x="45" y="45"/>
-					<Shadow>
-          				<Color r="0.1" g="0.1" b="0.1" a="0.9"/>
-          				<Offset x="2" y="-2"/>
-        			</Shadow>
-					<FontHeight>
-				      	<AbsValue val="40"/>
-				    </FontHeight>
-					<Anchors>
-						<Anchor point="CENTER" relativeTo="DontCastSpellIcon">
-							<Offset x="0" y="0" />
-						</Anchor>
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
-
- 	</Frame>
-</Ui> 	
+    <Layers>
+      <Layer level="ARTWORK">
+        <Texture setAllPoints="true">
+          <Color r="0.7" g="0.4" b="0.65" a="0" />
+        </Texture>
+        <FontString name="DontCastSpellText" font="Fonts\SKURRI.TTF" justifyH="LEFT" justifyV="MIDDLE" text="">
+          <Color r="1" g="1" b="0.1" a="0.9" />
+          <RelDimension x="0.75" y="1.0"/>
+          <Shadow>
+            <Color r="0.1" g="0.1" b="0.1" a="0.9"/>
+            <Offset x="2" y="-2"/>
+          </Shadow>
+          <FontHeight>
+            <AbsValue val="30"/>
+          </FontHeight>
+          <Anchors>
+            <Anchor point="LEFT">
+              <Offset x="50" y="0" />
+            </Anchor>
+          </Anchors>
+        </FontString>
+      </Layer>
+      <Layer level="ARTWORK">
+        <Texture name="DontCastSpellIcon" urgency="5" file="Interface\ICONS\INV_Misc_QuestionMark">
+          <Size x="45" y="45"/>
+          <Anchors>
+            <Anchor point="LEFT">
+              <Offset x="0" y="0" />
+            </Anchor>
+          </Anchors>
+        </Texture>
+        <FontString name="DontCastCountdownText" font="Fonts\SKURRI.TTF" justifyH="CENTER" justifyV="MIDDLE" text="">
+          <Color r="1" g="1" b=".1" a="0.85" />
+          <Size x="45" y="45"/>
+          <Shadow>
+            <Color r="0.1" g="0.1" b="0.1" a="0.9"/>
+            <Offset x="2" y="-2"/>
+          </Shadow>
+          <FontHeight>
+            <AbsValue val="40"/>
+          </FontHeight>
+          <Anchors>
+            <Anchor point="CENTER" relativeTo="DontCastSpellIcon">
+              <Offset x="0" y="0" />
+            </Anchor>
+          </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+  </Frame>
+</Ui>
