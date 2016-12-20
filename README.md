@@ -36,3 +36,4 @@ Prior to version 1.3.7 any auras added to the default list (e.g. Dispersion in v
 * integrate adding/removing auras via options UI
 * change configuration from account-wide to per-character
 * set expiring soon threshold to a provided spell's cast-time
+* add default list for melee players (with ability to toggle between caster and melee lists)
