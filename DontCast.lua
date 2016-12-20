@@ -92,14 +92,21 @@ local function defaultAuras()
     31224,  -- Cloak of Shadows
     33786,  -- Cyclone
     19263,  -- Deterrence
-    122783,  -- Diffuse Magic
+    122783, -- Diffuse Magic
     47585,  -- Dispersion
     642,    -- Divine Shield
     45438,  -- Ice Block
     76577,  -- Smoke Bomb
     23920,  -- Spell Reflection
-    122470,  -- Touch of Karma
+    122470, -- Touch of Karma
     186265, -- Aspect of the Turtle
+    212295, -- Nether Ward
+    198111, -- Temporal Shield
+    196555, -- Netherwalk
+    204018, -- Blessing of Spellwarding
+    221527, -- Imprison
+    228049, -- Guardian of the Forgotten Queen
+    184662, -- Shield of Vengeance
   }
 
   local names = {}

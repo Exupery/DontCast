@@ -4,17 +4,24 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 
 ## Default Buffs/Debuffs
 * Anti-Magic Shell
+* Aspect of the Turtle
+* Blessing of Spellwarding
 * Cloak of Shadows
 * Cyclone
 * Deterrence
 * Diffuse Magic
 * Dispersion
 * Divine Shield
+* Guardian of the Forgotten Queen
 * Ice Block
+* Imprison
+* Nether Ward
+* Netherwalk
+* Shield of Vengeance
 * Smoke Bomb
 * Spell Reflection
+* Temporal Shield
 * Touch of Karma
-* Aspect of the Turtle
 
 Prior to version 1.3.7 any auras added to the default list (e.g. Dispersion in v1.1.3) would not be enabled for players updating to (or beyond) that DontCast version. This was changed in v1.3.7 (e.g. all players will now have Aspect of the Turtle enabled by default) but this required changing how auras are removed/disabled. As a result any players that prior to v1.3.7 disabled an aura (via `/dontcast remove`) that is on the default list will have that aura re-enabled. Auras disabled in v1.3.7 (or higher) will not be affected by future changes to the default list.
 

@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.3.8
+- added Nether Ward, Shield of Vengeance, Blessing of Spellwarding, Guardian of the Forgotten Queen, Netherwalk, Imprison, and Temporal Shield to default buff list
+
 v1.3.7
 - added Aspect of the Turtle to default buff list
 - adding a new aura to the default list will now enable that aura for players upgrading from a previous version of DontCast
