@@ -37,3 +37,4 @@ Prior to version 1.3.7 any auras added to the default list (e.g. Dispersion in v
 * change configuration from account-wide to per-character
 * set expiring soon threshold to a provided spell's cast-time
 * add default list for melee players (with ability to toggle between caster and melee lists)
+* add support for immunity effects not shown as aura on target player (e.g. Counterstrike Totem, Mass Spell Reflection)
