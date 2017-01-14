@@ -536,8 +536,8 @@ local function eventHandler(self, event, unit, ...)
   elseif event == "PLAYER_REGEN_DISABLED" then
     lockFrame(false)
   elseif event == "ADDON_LOADED" and unit == "DontCast" then
-    addNewDefaults()
     auras = savedAuras()
+    addNewDefaults()
     config = savedConfig()
     createOptionsPanel()
     setFontStyle(config.fontstyle)
