@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.3.10
+- updated interface version for 7.2
+
 v1.3.9
 - fixed a regression introduced in v1.3.7 that prevented the addon from functioning for players who hadn't used a previous version or had cleared their WoW cache
 
