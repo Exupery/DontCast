@@ -86,34 +86,52 @@ local function setFontStyle(style)
   textFrame:SetFont(style, mainFrame:GetHeight() * 0.75)
 end
 
+local function addAurasToList(list, values)
+  for _, id in ipairs(values) do
+    local name = GetSpellInfo(id)
+    list[name] = true
+  end
+end
+
 local function defaultAuras()
-  local spellIds = {
-    48707,  -- Anti-Magic Shell
-    31224,  -- Cloak of Shadows
+  local baseIds = {
+    186265, -- Aspect of the Turtle
     33786,  -- Cyclone
     19263,  -- Deterrence
-    122783, -- Diffuse Magic
     47585,  -- Dispersion
     642,    -- Divine Shield
-    45438,  -- Ice Block
-    76577,  -- Smoke Bomb
-    23920,  -- Spell Reflection
-    122470, -- Touch of Karma
-    186265, -- Aspect of the Turtle
-    212295, -- Nether Ward
-    198111, -- Temporal Shield
-    196555, -- Netherwalk
-    204018, -- Blessing of Spellwarding
-    221527, -- Imprison
     228049, -- Guardian of the Forgotten Queen
+    45438,  -- Ice Block
+    221527, -- Imprison
+    196555, -- Netherwalk
+    115078, -- Paralysis
+    28272,  -- Polymorph
     184662, -- Shield of Vengeance
+    76577,  -- Smoke Bomb
+    198111, -- Temporal Shield
+    122470, -- Touch of Karma
+  }
+
+  local magicIds = {
+    48707,  -- Anti-Magic Shell
+    204018, -- Blessing of Spellwarding
+    31224,  -- Cloak of Shadows
+    122783, -- Diffuse Magic
+    212295, -- Nether Ward
+    23920,  -- Spell Reflection
+  }
+
+  local physicalIds = {
+    1022,   -- Blessing of Protection
+    118038, -- Die by the Sword
+    210918, -- Ethereal Form
+    199754, -- Riposte
   }
 
   local names = {}
-  for _, id in ipairs(spellIds) do
-    local name = GetSpellInfo(id)
-    names[name] = true
-  end
+  addAurasToList(names, baseIds)
+  addAurasToList(names, magicIds)
+  -- addAurasToList(physicalIds)
   return names
 end
 
