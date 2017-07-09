@@ -38,6 +38,7 @@ end
 local function lockFrame(hide)
   mainFrame:EnableMouse(false)
   resizeButton:Hide()
+  textFrame:SetSize(mainFrame:GetWidth(), mainFrame:GetHeight())
   if hide then
     mainFrame:Hide()
   end
