@@ -1,5 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
-    <Include file="Libs\DropDownMenu\UIDropDownMenuTemplates.xml"/>
-    <Script file="Libs\DropDownMenu\UIDropDownMenu.lua"/>
+    <Include file="Libs\MSA-DropDownMenu-1.0\MSA-DropDownMenu-1.0.xml"/>
+    <Include file="Libs\MSA-DropDownMenu-1.0\MSA-DropDownMenuTemplates.xml"/>
+    <Script file="Libs\MSA-DropDownMenu-1.0\MSA-DropDownMenu-1.0.lua"/>
 </Ui>

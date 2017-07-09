@@ -1,6 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
-	<Button name="Lib_UIDropDownMenuButtonTemplate" virtual="true">
+	<Button name="MSA_DropDownMenuButtonTemplate" virtual="true">
 		<Size x="100" y="16"/>
 		<Layers>
 			<Layer level="BACKGROUND">
@@ -69,16 +69,16 @@
 				<Scripts>
 					<OnClick>
 						CloseMenus();
-						Lib_UIDropDownMenuButton_OpenColorPicker(self:GetParent());
+						MSA_DropDownMenuButton_OpenColorPicker(self:GetParent());
 					</OnClick>
 					<OnEnter>
-						Lib_CloseDropDownMenus(self:GetParent():GetParent():GetID() + 1);
+						MSA_CloseDropDownMenus(self:GetParent():GetParent():GetID() + 1);
 						_G[self:GetName().."SwatchBg"]:SetVertexColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b);
-						Lib_UIDropDownMenu_StopCounting(self:GetParent():GetParent());
+						MSA_DropDownMenu_StopCounting(self:GetParent():GetParent());
 					</OnEnter>
 					<OnLeave>
 						_G[self:GetName().."SwatchBg"]:SetVertexColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-						Lib_UIDropDownMenu_StartCounting(self:GetParent():GetParent());
+						MSA_DropDownMenu_StartCounting(self:GetParent():GetParent());
 					</OnLeave>
 				</Scripts>
 				<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch"/>
@@ -92,27 +92,27 @@
 						<Offset>
 							<AbsDimension x="0" y="0"/>
 						</Offset>
-					</Anchor>                   
+					</Anchor>
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						Lib_ToggleDropDownMenu(self:GetParent():GetParent():GetID() + 1, self:GetParent().value, nil, nil, nil, nil, self:GetParent().menuList, self);
+						MSA_ToggleDropDownMenu(self:GetParent():GetParent():GetID() + 1, self:GetParent().value, nil, nil, nil, nil, self:GetParent().menuList, self);
 					</OnClick>
 					<OnEnter>
 						local level =  self:GetParent():GetParent():GetID() + 1;
-						local listFrame = _G["Lib_DropDownList"..level];
+						local listFrame = _G["MSA_DropDownList"..level];
 						if ( not listFrame or not listFrame:IsShown() or select(2, listFrame:GetPoint()) ~= self ) then
-							Lib_ToggleDropDownMenu(level, self:GetParent().value, nil, nil, nil, nil, self:GetParent().menuList, self);
+							MSA_ToggleDropDownMenu(level, self:GetParent().value, nil, nil, nil, nil, self:GetParent().menuList, self);
 						end
-						Lib_UIDropDownMenu_StopCounting(self:GetParent():GetParent());
+						MSA_DropDownMenu_StopCounting(self:GetParent():GetParent());
 					</OnEnter>
 					<OnLeave>
-						Lib_UIDropDownMenu_StartCounting(self:GetParent():GetParent());
+						MSA_DropDownMenu_StartCounting(self:GetParent():GetParent());
 					</OnLeave>
 				</Scripts>
 				<NormalTexture file="Interface\ChatFrame\ChatFrameExpandArrow"/>
 			</Button>
-			<Button name="$parentInvisibleButton" hidden="true">
+			<Button name="$parentInvisibleButton" hidden="true" parentKey="invisibleButton">
 				<Anchors>
 					<Anchor point="TOPLEFT"/>
 					<Anchor point="BOTTOMLEFT"/>
@@ -124,14 +124,14 @@
 				</Anchors>
 				<Scripts>
 					<OnEnter>
-						Lib_UIDropDownMenu_StopCounting(self:GetParent():GetParent());
-						Lib_CloseDropDownMenus(self:GetParent():GetParent():GetID() + 1);
+						MSA_DropDownMenu_StopCounting(self:GetParent():GetParent());
+						MSA_CloseDropDownMenus(self:GetParent():GetParent():GetID() + 1);
 						local parent = self:GetParent();
 						if ( parent.tooltipTitle and parent.tooltipWhileDisabled) then
 							if ( parent.tooltipOnButton ) then
 								GameTooltip:SetOwner(parent, "ANCHOR_RIGHT");
 								GameTooltip:AddLine(parent.tooltipTitle, 1.0, 1.0, 1.0);
-								GameTooltip:AddLine(parent.tooltipText, nil, nil, nil, 1);
+								GameTooltip:AddLine(parent.tooltipText, nil, nil, nil, true);
 								GameTooltip:Show();
 							else
 								GameTooltip_AddNewbieTip(parent, parent.tooltipTitle, 1.0, 1.0, 1.0, parent.tooltipText, 1);
@@ -139,36 +139,36 @@
 						end
 					</OnEnter>
 					<OnLeave>
-						Lib_UIDropDownMenu_StartCounting(self:GetParent():GetParent());
+						MSA_DropDownMenu_StartCounting(self:GetParent():GetParent());
 						GameTooltip:Hide();
 					</OnLeave>
 				</Scripts>
 			</Button>
 		</Frames>
 		<Scripts>
-			<OnLoad>				
+			<OnLoad>
 				self:SetFrameLevel(self:GetParent():GetFrameLevel()+2);
 			</OnLoad>
 			<OnClick>
-				Lib_UIDropDownMenuButton_OnClick(self, button, down);
+				MSA_DropDownMenuButton_OnClick(self, button, down);
 			</OnClick>
 			<OnEnter>
 				if ( self.hasArrow ) then
 					local level =  self:GetParent():GetID() + 1;
-					local listFrame = _G["Lib_DropDownList"..level];
+					local listFrame = _G["MSA_DropDownList"..level];
 					if ( not listFrame or not listFrame:IsShown() or select(2, listFrame:GetPoint()) ~= self ) then
-						Lib_ToggleDropDownMenu(self:GetParent():GetID() + 1, self.value, nil, nil, nil, nil, self.menuList, self);
+						MSA_ToggleDropDownMenu(self:GetParent():GetID() + 1, self.value, nil, nil, nil, nil, self.menuList, self);
 					end
 				else
-					Lib_CloseDropDownMenus(self:GetParent():GetID() + 1);
+					MSA_CloseDropDownMenus(self:GetParent():GetID() + 1);
 				end
 				_G[self:GetName().."Highlight"]:Show();
-				Lib_UIDropDownMenu_StopCounting(self:GetParent());
+				MSA_DropDownMenu_StopCounting(self:GetParent());
 				if ( self.tooltipTitle ) then
 					if ( self.tooltipOnButton ) then
 						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 						GameTooltip:AddLine(self.tooltipTitle, 1.0, 1.0, 1.0);
-						GameTooltip:AddLine(self.tooltipText);
+						GameTooltip:AddLine(self.tooltipText, nil, nil, nil, true);
 						GameTooltip:Show();
 					else
 						GameTooltip_AddNewbieTip(self, self.tooltipTitle, 1.0, 1.0, 1.0, self.tooltipText, 1);
@@ -177,9 +177,15 @@
 			</OnEnter>
 			<OnLeave>
 				_G[self:GetName().."Highlight"]:Hide();
-				Lib_UIDropDownMenu_StartCounting(self:GetParent());
+				MSA_DropDownMenu_StartCounting(self:GetParent());
 				GameTooltip:Hide();
 			</OnLeave>
+			<OnEnable>
+				self.invisibleButton:Hide();
+			</OnEnable>
+			<OnDisable>
+				self.invisibleButton:Show();
+			</OnDisable>
 		</Scripts>
 		<ButtonText name="$parentNormalText">
 			<Anchors>
@@ -192,8 +198,7 @@
 		<HighlightFont style="GameFontHighlightSmallLeft"/>
 		<DisabledFont style="GameFontDisableSmallLeft"/>
 	</Button>
-	
-	<Button name="Lib_UIDropDownListTemplate" hidden="true" frameStrata="DIALOG" enableMouse="true" virtual="true">
+	<Button name="MSA_DropDownListTemplate" hidden="true" frameStrata="DIALOG" enableMouse="true" virtual="true">
 		<Frames>
 			<Frame name="$parentBackdrop" setAllPoints="true">
 				<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background-Dark" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
@@ -227,30 +232,30 @@
 					</OnLoad>
 				</Scripts>
 			</Frame>
-			<Button name="$parentButton1" inherits="Lib_UIDropDownMenuButtonTemplate" id="1"/>
-			<Button name="$parentButton2" inherits="Lib_UIDropDownMenuButtonTemplate" id="2"/>
-			<Button name="$parentButton3" inherits="Lib_UIDropDownMenuButtonTemplate" id="3"/>
-			<Button name="$parentButton4" inherits="Lib_UIDropDownMenuButtonTemplate" id="4"/>
-			<Button name="$parentButton5" inherits="Lib_UIDropDownMenuButtonTemplate" id="5"/>
-			<Button name="$parentButton6" inherits="Lib_UIDropDownMenuButtonTemplate" id="6"/>
-			<Button name="$parentButton7" inherits="Lib_UIDropDownMenuButtonTemplate" id="7"/>
-			<Button name="$parentButton8" inherits="Lib_UIDropDownMenuButtonTemplate" id="8"/>
+			<Button name="$parentButton1" inherits="MSA_DropDownMenuButtonTemplate" id="1"/>
+			<Button name="$parentButton2" inherits="MSA_DropDownMenuButtonTemplate" id="2"/>
+			<Button name="$parentButton3" inherits="MSA_DropDownMenuButtonTemplate" id="3"/>
+			<Button name="$parentButton4" inherits="MSA_DropDownMenuButtonTemplate" id="4"/>
+			<Button name="$parentButton5" inherits="MSA_DropDownMenuButtonTemplate" id="5"/>
+			<Button name="$parentButton6" inherits="MSA_DropDownMenuButtonTemplate" id="6"/>
+			<Button name="$parentButton7" inherits="MSA_DropDownMenuButtonTemplate" id="7"/>
+			<Button name="$parentButton8" inherits="MSA_DropDownMenuButtonTemplate" id="8"/>
 		</Frames>
 		<Scripts>
 			<OnClick>
 				self:Hide();
 			</OnClick>
 			<OnEnter>
-				Lib_UIDropDownMenu_StopCounting(self, motion);
+				MSA_DropDownMenu_StopCounting(self, motion);
 			</OnEnter>
 			<OnLeave>
-				Lib_UIDropDownMenu_StartCounting(self, motion);
+				MSA_DropDownMenu_StartCounting(self, motion);
 			</OnLeave>
 			<OnUpdate>
-				Lib_UIDropDownMenu_OnUpdate(self, elapsed);
+				MSA_DropDownMenu_OnUpdate(self, elapsed);
 			</OnUpdate>
 			<OnShow>
-				for i=1, LIB_UIDROPDOWNMENU_MAXBUTTONS do
+				for i=1, MSA_DROPDOWNMENU_MAXBUTTONS do
 					if (not self.noResize) then
 						_G[self:GetName().."Button"..i]:SetWidth(self.maxWidth);
 					end
@@ -260,16 +265,15 @@
 				end
 				self.showTimer = nil;
 				if ( self:GetID() > 1 ) then
-					self.parent = _G["Lib_DropDownList"..(self:GetID() - 1)];
+					self.parent = _G["MSA_DropDownList"..(self:GetID() - 1)];
 				end
 			</OnShow>
 			<OnHide>
-				Lib_UIDropDownMenu_OnHide(self);
+				MSA_DropDownMenu_OnHide(self);
 			</OnHide>
 		</Scripts>
 	</Button>
-	
-	<Frame name="Lib_UIDropDownMenuTemplate" virtual="true">
+	<Frame name="MSA_DropDownMenuTemplate" virtual="true">
 		<Size>
 			<AbsDimension x="40" y="32"/>
 		</Size>
@@ -306,7 +310,7 @@
 					</Anchors>
 					<TexCoords left="0.8046875" right="1" top="0" bottom="1"/>
 				</Texture>
-				<FontString name="$parentText" inherits="GameFontHighlightSmall" wordwrap="false" justifyH="RIGHT">
+				<FontString parentKey="Text" name="$parentText" inherits="GameFontHighlightSmall" wordwrap="false" justifyH="RIGHT">
 					<Size>
 						<AbsDimension x="0" y="10"/>
 					</Size>
@@ -320,7 +324,7 @@
 				</FontString>
 			</Layer>
 			<Layer level="OVERLAY">
-				<Texture name="$parentIcon" hidden="true">
+				<Texture parentKey="Icon" name="$parentIcon" hidden="true">
 					<Size>
 						<AbsDimension x="16" y="16"/>
 					</Size>
@@ -333,7 +337,7 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Button name="$parentButton"  motionScriptsWhileDisabled="true" >
+			<Button parentKey="Button" name="$parentButton" motionScriptsWhileDisabled="true" >
 				<Size>
 					<AbsDimension x="24" y="24"/>
 				</Size>
@@ -360,7 +364,7 @@
 						end
 					</OnLeave>
 					<OnClick>
-						Lib_ToggleDropDownMenu(nil, nil, self:GetParent());
+						MSA_ToggleDropDownMenu(nil, nil, self:GetParent());
 						PlaySound("igMainMenuOptionCheckBoxOn");
 					</OnClick>
 				</Scripts>
@@ -400,7 +404,7 @@
 		</Frames>
 		<Scripts>
 			<OnHide>
-				Lib_CloseDropDownMenus();
+				MSA_CloseDropDownMenus();
 			</OnHide>
 		</Scripts>
 	</Frame>
