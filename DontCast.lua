@@ -56,6 +56,7 @@ local function defaultConfig()
   return {
     threshold = 1.5,
     fontstyle = "Fonts\\skurri.ttf",
+    fontalignment = "LEFT",
     aurabeginsound = "",
     auraendsound = ""
   }
@@ -84,6 +85,10 @@ end
 local function setFontStyle(style)
   cdTextFrame:SetFont(style, mainFrame:GetHeight() * 0.6)
   textFrame:SetFont(style, mainFrame:GetHeight() * 0.75)
+end
+
+local function setFontAlignment(justification)
+  textFrame:SetJustifyH(justification)
 end
 
 local function addAurasToList(list, values)
@@ -294,6 +299,12 @@ local function fontStyleSelected(self)
   Lib_UIDropDownMenu_SetSelectedID(optionsFrame.fontstyle, self:GetID())
 end
 
+local function fontAlignmentSelected(self)
+  setFontAlignment(self.value)
+  tempConfig.fontalignment = self.value
+  Lib_UIDropDownMenu_SetSelectedID(optionsFrame.fontalignment, self:GetID())
+end
+
 local function createButton(text, parent)
   local button = CreateFrame("Button", "DontCast"..text.."Button", parent, "UIPanelButtonTemplate")
   button:SetHeight(20)
@@ -346,6 +357,21 @@ local function fontStyleDropDownOnLoad(frame, level, menuList)
 
   local selected = tempConfig.fontstyle ~= nil and tempConfig.fontstyle or config.fontstyle
   Lib_UIDropDownMenu_SetSelectedValue(optionsFrame.fontstyle, selected)
+end
+
+local function fontAlignmentDropDownOnLoad(frame, level, menuList)
+  local alignments = {
+    Left = "LEFT",
+    Center = "CENTER",
+    Right = "RIGHT"
+  }
+
+  for k, v in pairs(alignments) do
+    createDropDownInfo(k, v, fontAlignmentSelected)
+  end
+
+  local selected = tempConfig.fontalignment ~= nil and tempConfig.fontalignment or config.fontalignment
+  Lib_UIDropDownMenu_SetSelectedValue(optionsFrame.fontalignment, selected)
 end
 
 local function auraSoundDropDownOnLoad(soundSelectFunction, frame, setTo)
@@ -420,6 +446,10 @@ local function drawFontStyleOptions(parent, xOffset, yOffset)
   parent.fontstyle = createDropDown("DontCastFontStyle", parent)
   parent.fontstyle:SetPoint("LEFT", label, "RIGHT", 0, 0)
   Lib_UIDropDownMenu_Initialize(parent.fontstyle, fontStyleDropDownOnLoad)
+
+  parent.fontalignment = createDropDown("DontCastFontAlignment", parent)
+  parent.fontalignment:SetPoint("LEFT", parent.fontstyle, "RIGHT", 110, 0)
+  Lib_UIDropDownMenu_Initialize(parent.fontalignment, fontAlignmentDropDownOnLoad)
 end
 
 local function drawAuraOptions(parent, xOffset, yOffset)
@@ -468,6 +498,7 @@ end
 local function updateOptionsUI()
   setInputBoxText(optionsFrame.threshold, config.threshold)
   fontStyleDropDownOnLoad()
+  fontAlignmentDropDownOnLoad()
   beginSoundDropDownOnLoad()
   endSoundDropDownOnLoad()
 end
@@ -507,6 +538,7 @@ end
 local function cancelOptions()
   resetTempConfig()
   setFontStyle(config.fontstyle)
+  setFontAlignment(config.fontalignment)
   hideAndLockFrame()
 end
 
@@ -517,6 +549,7 @@ local function defaultOptions()
   DontCastConfig = config
   setThreshold(config.threshold, false)
   setFontStyle(config.fontstyle)
+  setFontAlignment(config.fontalignment)
   centerFrame()
   hideAndLockFrame()
   InterfaceOptionsFrame:Hide()
@@ -559,6 +592,7 @@ local function eventHandler(self, event, unit, ...)
     config = savedConfig()
     createOptionsPanel()
     setFontStyle(config.fontstyle)
+    setFontAlignment(config.fontalignment)
   end
 end
 
