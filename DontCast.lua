@@ -525,6 +525,7 @@ end
 local function saveOptions()
   setThreshold(optionsFrame.threshold:GetText(), false)
   updateConfig("fontstyle", textFrame:GetFont())
+  updateConfig("fontalignment", textFrame:GetJustifyH())
 
   if tempConfig.aurabeginsound ~= nil then
     updateConfig("aurabeginsound", tempConfig.aurabeginsound)
