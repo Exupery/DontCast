@@ -6,9 +6,12 @@ local iconFrame = nil
 local optionsFrame = nil
 local cdTextFrame = nil
 local resizeButton = nil
-local auras = {}
+
+local playerServer = nil
 local config = {}
 local tempConfig = {}
+local auras = {}
+
 local upAuras = {}
 local updCtr = 0
 
@@ -64,21 +67,43 @@ local function defaultConfig()
 end
 
 local function savedConfig()
+  local oldGlobal = "OLDGLOBAL"
   if not DontCastConfig then
-    DontCastConfig = defaultConfig()
+    DontCastConfig = {}
+  elseif DontCastConfig[oldGlobal] == nil then
+    -- config was global pre-1.4, migrate old global config
+    DontCastConfig[oldGlobal] = {}
+    for k, v in pairs(DontCastConfig) do
+      if string.find(k, "-") == nil and string.find(k, oldGlobal) == nil then
+        DontCastConfig[oldGlobal][k] = v
+      end
+    end
+    for k, _ in pairs(DontCastConfig[oldGlobal]) do
+      DontCastConfig[k] = nil
+    end
   end
+
+  if not DontCastConfig[playerServer] then
+    if DontCastConfig[oldGlobal] ~= nil then
+      DontCastConfig[playerServer] = DontCastConfig[oldGlobal]
+    else
+      DontCastConfig[playerServer] = defaultConfig()
+    end
+  end
+
   -- if user upgrades to version that introduces new config vars set to default
   for k, v in pairs(defaultConfig()) do
-    if DontCastConfig[k] == nil then DontCastConfig[k] = v end
+    if DontCastConfig[playerServer][k] == nil then DontCastConfig[playerServer][k] = v end
   end
-  return DontCastConfig
+
+  return DontCastConfig[playerServer]
 end
 
 local function updateConfig(key, value)
-  DontCastConfig[key] = value
-  local updated = DontCastConfig[key] == value
+  DontCastConfig[playerServer][key] = value
+  local updated = DontCastConfig[playerServer][key] == value
   if updated then
-    config = savedConfig()
+    config = DontCastConfig[playerServer]
   end
   return updated
 end
@@ -548,7 +573,7 @@ local function defaultOptions()
   auras = defaultAuras()
   DontCastAuras = auras
   config = defaultConfig()
-  DontCastConfig = config
+  DontCastConfig[playerServer] = config
   setThreshold(config.threshold, false)
   setFontStyle(config.fontstyle)
   setFontAlignment(config.fontalignment)
@@ -589,6 +614,7 @@ local function eventHandler(self, event, unit, ...)
   elseif event == "PLAYER_REGEN_DISABLED" then
     lockFrame(false)
   elseif event == "ADDON_LOADED" and unit == "DontCast" then
+    playerServer = UnitName("player").." - "..GetRealmName()
     auras = savedAuras()
     addNewDefaults()
     config = savedConfig()
