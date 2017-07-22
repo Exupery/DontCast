@@ -15,6 +15,10 @@ local auras = {}
 local upAuras = {}
 local updCtr = 0
 
+local BASE = "base"
+local MAGICAL = "magical"
+local PHYSICAL = "physical"
+
 local function colorPrint(msg)
   print("|cffb2b2b2"..msg)
 end
@@ -124,8 +128,8 @@ local function addAurasToList(list, values)
   end
 end
 
-local function defaultAuras()
-  local baseIds = {
+local function defaultBaseAuras()
+  return {
     186265, -- Aspect of the Turtle
     33786,  -- Cyclone
     19263,  -- Deterrence
@@ -142,8 +146,10 @@ local function defaultAuras()
     198111, -- Temporal Shield
     122470, -- Touch of Karma
   }
+end
 
-  local magicIds = {
+local function defaultMagicalAuras()
+  return {
     48707,  -- Anti-Magic Shell
     204018, -- Blessing of Spellwarding
     31224,  -- Cloak of Shadows
@@ -151,31 +157,61 @@ local function defaultAuras()
     212295, -- Nether Ward
     23920,  -- Spell Reflection
   }
+end
 
-  local physicalIds = {
+local function defaultPhysicalAuras()
+  return {
     1022,   -- Blessing of Protection
     118038, -- Die by the Sword
     210918, -- Ethereal Form
     199754, -- Riposte
   }
+end
 
-  local names = {}
-  addAurasToList(names, baseIds)
-  addAurasToList(names, magicIds)
-  -- addAurasToList(physicalIds)
-  return names
+local function defaultAuras()
+  local defaults = {}
+  defaults[BASE] = defaultBaseAuras()
+  defaults[MAGICAL] = defaultMagicalAuras()
+  defaults[PHYSICAL] = defaultPhysicalAuras()
+  return defaults
 end
 
 local function savedAuras()
   if not DontCastAuras then
-    DontCastAuras = defaultAuras()
+    DontCastAuras = {}
   end
-  return DontCastAuras
+
+  if DontCastAuras[BASE] == nil then
+    DontCastAuras[BASE] = {}
+    -- migrate pre-1.4 auras to handle user-added auras
+    for k, v in pairs(DontCastAuras) do
+      if string.find(k, BASE) == nil then
+        DontCastAuras[BASE][k] = v
+      end
+    end
+    for k, _ in pairs(DontCastAuras[BASE]) do
+      DontCastAuras[k] = nil
+    end
+    addAurasToList(DontCastAuras[BASE], defaultBaseAuras())
+  end
+
+  if DontCastAuras[MAGICAL] == nil then
+    DontCastAuras[MAGICAL] = {}
+    addAurasToList(DontCastAuras[MAGICAL], defaultMagicalAuras())
+  end
+
+  if DontCastAuras[PHYSICAL] == nil then
+    DontCastAuras[PHYSICAL] = {}
+    addAurasToList(DontCastAuras[PHYSICAL], defaultPhysicalAuras())
+  end
+
+  -- TODO GET SPEC
+  return DontCastAuras[BASE]
 end
 
-local function addAura(aura)
-  DontCastAuras[aura] = true
-  if DontCastAuras[aura] then
+local function addAura(aura, listName)
+  DontCastAuras[listName][aura] = true
+  if DontCastAuras[listName][aura] then
     auras = savedAuras()
     colorPrint("Added "..aura)
   else
@@ -184,25 +220,32 @@ local function addAura(aura)
 end
 
 local function removeAura(aura)
-  DontCastAuras[aura] = false
-  if not DontCastAuras[aura] then
-    auras = savedAuras()
-    colorPrint("Removed "..aura)
-  else
-    errorPrint("Unable to remove "..aura)
+  for listName, _ in pairs(defaultAuras()) do
+    if DontCastAuras[listName][aura] then
+      DontCastAuras[listName][aura] = false
+      if not DontCastAuras[listName][aura] then
+        auras = savedAuras()
+        colorPrint("Removed "..aura)
+      else
+        errorPrint("Unable to remove "..aura)
+      end
+    end
   end
 end
 
 local function addNewDefaults()
-  for aura, _ in pairs(defaultAuras()) do
-    if DontCastAuras[aura] == nil then addAura(aura) end
+  for listName, list in pairs(defaultAuras()) do
+    for _, auraId in pairs(list) do
+      local aura = GetSpellInfo(auraId)
+      if DontCastAuras[listName][aura] == nil then addAura(aura, listName) end
+    end
   end
 end
 
 local function displayAuras()
   colorPrint("DontCast is triggered by the following:")
-  for aura, _ in pairs(DontCastAuras) do
-    if DontCastAuras[aura] then print(aura) end
+  for aura, _ in pairs(auras) do
+    if auras[aura] then print(aura) end
   end
 end
 
@@ -230,7 +273,7 @@ local function displayCountdown(duration)
 end
 
 local function isValid(name)
-  if DontCastAuras[name] == nil or DontCastAuras[name] == false then
+  if auras[name] == nil or auras[name] == false then
     return false
   end
 
@@ -257,7 +300,7 @@ end
 local function auraUpdated(self, event, unit, ...)
   if unit == "target" and targetIsHostile() then
     local hasAura = false
-    for aura, _ in pairs(DontCastAuras) do
+    for aura, _ in pairs(auras) do
       local name, rank, icon, count, type, dur, expTime = UnitBuff(unit, aura)
       if not name then
         name, rank, icon, count, type, dur, expTime = UnitDebuff(unit, aura)
@@ -428,13 +471,6 @@ local function createDropDown(name, parent)
   return dropdown
 end
 
-local function createCheckBox(text, parent)
-  local checkbox = CreateFrame("CheckButton", "DontCast"..text.."CheckButton", parent, "UICheckButtonTemplate")
-  checkbox:ClearAllPoints()
-  _G[checkbox:GetName().."Text"]:SetText(text)
-  return checkbox
-end
-
 local function createLabel(text, parent, xOffset, yOffset)
   local label = parent:CreateFontString("DontCast"..text.."Label", "OVERLAY", "GameFontNormal")
   label:SetPoint("TOPLEFT", xOffset, yOffset)
@@ -476,15 +512,6 @@ local function drawFontStyleOptions(parent, xOffset, yOffset)
   parent.fontalignment = createDropDown("DontCastFontAlignment", parent)
   parent.fontalignment:SetPoint("LEFT", parent.fontstyle, "RIGHT", 110, 0)
   MSA_DropDownMenu_Initialize(parent.fontalignment, fontAlignmentDropDownOnLoad)
-end
-
-local function drawAuraOptions(parent, xOffset, yOffset)
-  local y = yOffset
-  for aura, _ in pairs(DontCastAuras) do
-    local checkbox = createCheckBox(aura, parent)
-    checkbox:SetPoint("TOPLEFT", xOffset, y)
-    y = y - 25
-  end
 end
 
 local function beginSoundSelected(self)
@@ -570,8 +597,8 @@ local function cancelOptions()
 end
 
 local function defaultOptions()
-  auras = defaultAuras()
-  DontCastAuras = auras
+  DontCastAuras = defaultAuras()
+  auras = savedAuras()
   config = defaultConfig()
   DontCastConfig[playerServer] = config
   setThreshold(config.threshold, false)
@@ -683,7 +710,17 @@ SlashCmdList["DONTCAST"] = function(cmd)
     elseif string.match(cmd, "add%s+%w+") then
       local aura = string.match(cmd, "add%s+(.+)")
       if aura then
-        addAura(aura)
+        addAura(aura, BASE)
+      end
+    elseif string.match(cmd, "addm%s+%w+") then
+      local aura = string.match(cmd, "addm%s+(.+)")
+      if aura then
+        addAura(aura, MAGICAL)
+      end
+    elseif string.match(cmd, "addp%s+%w+") then
+      local aura = string.match(cmd, "addp%s+(.+)")
+      if aura then
+        addAura(aura, PHYSICAL)
       end
     elseif string.match(cmd, "remove%s+%w+") then
       local aura = string.match(cmd, "remove%s+(.+)")
@@ -701,6 +738,7 @@ SlashCmdList["DONTCAST"] = function(cmd)
       displayAuras()
     elseif cmd == "default" then
       DontCastAuras = defaultAuras()
+      auras = savedAuras()
       colorPrint("DontCast reverted to default triggers")
     elseif string.match(cmd, "config%w*") then
       -- call twice to workaround WoW bug where very first call opens wrong tab
@@ -710,6 +748,8 @@ SlashCmdList["DONTCAST"] = function(cmd)
     else
       colorPrint("DontCast commands:")
       print("/dontcast add NAME - adds the named buff or debuff")
+      print("/dontcast addm NAME - adds the named buff or debuff for magical mode only")
+      print("/dontcast addp NAME - adds the named buff or debuff for physical mode only")
       print("/dontcast remove NAME - removes the named buff or debuff")
       print("/dontcast threshold #.## - set the threshold for changing color of countdown text")
       print("/dontcast show threshold - display the threshold color of countdown text changes")
