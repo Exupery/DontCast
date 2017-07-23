@@ -2,6 +2,7 @@ DONTCAST CHANGE LOG
 ===================
 
 v1.4
+- the addon now has two modes, based on Magical or Physical damage, each with their own set of defaults, the mode will switch automatically depending on the player's spec
 - configuration is now per-character instead of account-wide
 - text alignment of the aura name is now configurable via the options panel (defaults to left justified)
 - added Paralysis and Polymorph to default list

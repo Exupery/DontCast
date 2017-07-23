@@ -176,6 +176,26 @@ local function defaultAuras()
   return defaults
 end
 
+local function isCasterOrHealer()
+  -- return early if spec not set yet (i.e. addon may get loaded before GetSpecialization returns non-nil value)
+  -- defaulting to true since addon was originally written for casters but this shouldn't
+  -- end up mattering as the auras assignment will get re-called when ACTIVE_TALENT_GROUP_CHANGED fires
+  if GetSpecialization() == nil then return true end
+
+  local specId = GetSpecializationInfo(GetSpecialization())
+
+  local casterIds = {[62] = true, [63] = true, [64] = true, [102] = true, [258] = true, [262] = true, [265] = true, [266] = true, [267] = true}
+
+  local healerIds = {[65] = true, [105] = true, [256] = true, [257] = true, [264] = true, [270] = true}
+
+  return casterIds[specId] or healerIds[specId]
+end
+
+-- adds values from secondTable to firstTable
+local function mergeTables(firstTable, secondTable)
+  for k, v in pairs(secondTable) do firstTable[k] = v end
+end
+
 local function savedAuras()
   if not DontCastAuras then
     DontCastAuras = {}
@@ -205,8 +225,14 @@ local function savedAuras()
     addAurasToList(DontCastAuras[PHYSICAL], defaultPhysicalAuras())
   end
 
-  -- TODO GET SPEC
-  return DontCastAuras[BASE]
+  local specAuras = {}
+  mergeTables(specAuras, DontCastAuras[BASE])
+  if isCasterOrHealer() then
+    mergeTables(specAuras, DontCastAuras[MAGICAL])
+  else
+    mergeTables(specAuras, DontCastAuras[PHYSICAL])
+  end
+  return specAuras
 end
 
 local function addAura(aura, listName)
@@ -640,6 +666,8 @@ local function eventHandler(self, event, unit, ...)
     targetChanged(self, event, unit)
   elseif event == "PLAYER_REGEN_DISABLED" then
     lockFrame(false)
+  elseif event == "ACTIVE_TALENT_GROUP_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
+    auras = savedAuras()
   elseif event == "ADDON_LOADED" and unit == "DontCast" then
     playerServer = UnitName("player").." - "..GetRealmName()
     auras = savedAuras()
@@ -688,6 +716,8 @@ function loadDontCast(self, text, icon, cdText)
     eventFrame:RegisterEvent("ADDON_LOADED")
     eventFrame:RegisterEvent("UNIT_AURA")
     eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
+    eventFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
+    eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
     eventFrame:SetScript("OnEvent", eventHandler)
     eventFrame:SetScript("OnUpdate", onUpdate)
 

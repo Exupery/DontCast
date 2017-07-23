@@ -1,6 +1,6 @@
 # DontCast
 ### World of Warcraft PvP addon
-Warns a player when their current target has buffs or debuffs that eliminate (or significantly mitigate) incoming damage. [The default buff/debuff list is most relevant to casters - but the list can be easily modified to suit melee players]. Displays the name and icon of the buff/debuff, as well as a timer displaying a countdown of time remaining until the effect expires. Buffs and debuffs can be added and removed with the appropriate slash commands.
+Warns a player when their current target has buffs or debuffs that eliminate (or significantly mitigate) incoming damage. The default buff/debuff list will switch modes (between magical and physical) depending on the current spec of the player. Displays the name and icon of the buff/debuff, as well as a timer displaying a countdown of time remaining until the effect expires. Buffs and debuffs can be added and removed with the appropriate slash commands.
 
 ## Default Buffs/Debuffs
 * Anti-Magic Shell (Magical mode only)
