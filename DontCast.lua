@@ -574,12 +574,54 @@ local function drawSoundOptions(parent, xOffset, yOffset)
   MSA_DropDownMenu_Initialize(parent.auraendsound, endSoundDropDownOnLoad)
 end
 
-local function updateOptionsUI()
-  setInputBoxText(optionsFrame.threshold, config.threshold)
+local function reloadDropDowns()
   fontStyleDropDownOnLoad()
   fontAlignmentDropDownOnLoad()
   beginSoundDropDownOnLoad()
   endSoundDropDownOnLoad()
+end
+
+local function copyConfigSelected(self)
+  tempConfig.copyconfig = self.value
+  for k, v in pairs(self.value) do
+    tempConfig[k] = v
+  end
+  setInputBoxText(optionsFrame.threshold, tempConfig.threshold)
+  setFontStyle(tempConfig.fontstyle)
+  setFontAlignment(tempConfig.fontalignment)
+  reloadDropDowns()
+  MSA_DropDownMenu_SetSelectedID(optionsFrame.copyconfig, self:GetID())
+end
+
+local function copyConfigDropDownOnLoad()
+  local sorted = {}
+  for k, _ in pairs(DontCastConfig) do
+    if k ~= "OLDGLOBAL" then table.insert(sorted, k) end
+  end
+  table.sort(sorted)
+  for _, k in ipairs(sorted) do
+    createDropDownInfo(k, DontCastConfig[k], copyConfigSelected)
+  end
+
+  if tempConfig.copyconfig then
+    MSA_DropDownMenu_SetSelectedValue(optionsFrame.copyconfig, tempConfig.copyconfig)
+  else
+    MSA_DropDownMenu_SetSelectedName(optionsFrame.copyconfig, playerServer)
+  end
+end
+
+local function drawCopyConfigOptions(parent, xOffset, yOffset)
+  local label = createLabel("Copy configuration from", parent, xOffset, yOffset)
+  parent.copyconfig = createDropDown("CopyConfig", parent)
+  parent.copyconfig:SetPoint("LEFT", label, "RIGHT", 0, 0)
+  MSA_DropDownMenu_SetWidth(parent.copyconfig, 225)
+  MSA_DropDownMenu_Initialize(parent.copyconfig, copyConfigDropDownOnLoad)
+end
+
+local function updateOptionsUI()
+  setInputBoxText(optionsFrame.threshold, config.threshold)
+  reloadDropDowns()
+  copyConfigDropDownOnLoad()
 end
 
 local function setThreshold(threshold, echo)
@@ -655,6 +697,7 @@ local function createOptionsPanel()
   drawThresholdOptions(optionsFrame, xOffset, -90)
   drawFontStyleOptions(optionsFrame, xOffset, -130)
   drawSoundOptions(optionsFrame, xOffset, -170)
+  drawCopyConfigOptions(optionsFrame, xOffset, -270)
 
   updateOptionsUI()
 end
