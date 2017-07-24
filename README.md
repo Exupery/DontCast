@@ -32,19 +32,19 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 Prior to version 1.3.7 any auras added to the default list (e.g. Dispersion in v1.1.3) would not be enabled for players updating to (or beyond) that DontCast version. This was changed in v1.3.7 (e.g. all players will now have Aspect of the Turtle enabled by default) but this required changing how auras are removed/disabled. As a result any players that prior to v1.3.7 disabled an aura (via `/dontcast remove`) that is on the default list will have that aura re-enabled. Auras disabled in v1.3.7 (or higher) will not be affected by future changes to the default list.
 
 ## Commands
-* /dontcast add NAME - adds the named buff or debuff to the base list of auras (those that will show in either magical or physical mode)
-* /dontcast addm NAME - adds the named buff or debuff for magical mode only
-* /dontcast addp NAME - adds the named buff or debuff for physical mode only
-* /dontcast remove NAME - removes the named buff or debuff
-* /dontcast threshold #.## - set the threshold for changing color of countdown text
-* /dontcast show threshold - display the threshold color of countdown text changes
-* /dontcast list - display what will trigger the warning
-* /dontcast default - reverts to the default triggers
-* /dontcast show - Shows the addon and allows repositioning and resizing
-* /dontcast hide - Hides (and locks) the addon
-* /dontcast center - Sets the position to center of screen
-* /dontcast config - Opens the options UI
-* /dontcast ? or /dontcast help - Prints the command list
+* `/dontcast add NAME` - adds the named buff or debuff to the base list of auras (those that will show in either magical or physical mode)
+* `/dontcast addm NAME` - adds the named buff or debuff for magical mode only
+* `/dontcast addp NAME` - adds the named buff or debuff for physical mode only
+* `/dontcast remove NAME` - removes the named buff or debuff
+* `/dontcast threshold #.##` - set the threshold for changing color of countdown text
+* `/dontcast show threshold` - display the threshold color of countdown text changes
+* `/dontcast list` - display what will trigger the warning
+* `/dontcast default` - reverts to the default triggers
+* `/dontcast show` - Shows the addon and allows repositioning and resizing
+* `/dontcast hide` - Hides (and locks) the addon
+* `/dontcast center` - Sets the position to center of screen
+* `/dontcast config` - Opens the options UI
+* `/dontcast ?` or `/dontcast help` - Prints the command list
 
 ## TODOs
 * customizable text colors
