@@ -1,6 +1,11 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.4.1
+- added additional sounds options for aura begin/end
+- updated sounds to use SoundKitIDs instead of strings
+- updated interface version for 7.3
+
 v1.4
 - the addon now has two modes, based on Magical or Physical damage, each with their own set of defaults, the mode will switch automatically depending on the player's spec
 - configuration is now per-character instead of account-wide

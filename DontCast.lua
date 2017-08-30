@@ -472,10 +472,10 @@ end
 local function auraSoundDropDownOnLoad(soundSelectFunction, frame, setTo)
   local sounds = {
     None = "",
-    DoubleBell = "AuctionWindowClose",
-    RaidWarning = "RaidWarning",
-    ReadyCheck = "ReadyCheck",
-    SingleBell = "AuctionWindowOpen"
+    DoubleBell = SOUNDKIT.AUCTION_WINDOW_CLOSE,
+    RaidWarning = SOUNDKIT.RAID_WARNING,
+    ReadyCheck = SOUNDKIT.READY_CHECK,
+    SingleBell = SOUNDKIT.AUCTION_WINDOW_OPEN,
   }
 
   local sorted = {}
@@ -566,11 +566,13 @@ local function drawSoundOptions(parent, xOffset, yOffset)
   local beginLabel = createLabel("Aura begins sound", parent, xOffset, yOffset)
   parent.aurabeginsound = createDropDown("AuraBeginSound", parent)
   parent.aurabeginsound:SetPoint("LEFT", beginLabel, "RIGHT", 0, 0)
+  MSA_DropDownMenu_SetWidth(parent.aurabeginsound, 140)
   MSA_DropDownMenu_Initialize(parent.aurabeginsound, beginSoundDropDownOnLoad)
 
   local endLabel = createLabel("Aura ends sound", parent, xOffset, yOffset - 40)
   parent.auraendsound = createDropDown("AuraEndSound", parent)
   parent.auraendsound:SetPoint("LEFT", endLabel, "RIGHT", 0, 0)
+  MSA_DropDownMenu_SetWidth(parent.auraendsound, 140)
   MSA_DropDownMenu_Initialize(parent.auraendsound, endSoundDropDownOnLoad)
 end
 
@@ -702,6 +704,26 @@ local function createOptionsPanel()
   updateOptionsUI()
 end
 
+-- 7.3 changed the sound API to take a constant
+-- instead of a string to specify the sound to play,
+-- update old config strings to appropriate constants
+local function updateSoundConfig()
+  local soundKitIds = {
+    AuctionWindowOpen = SOUNDKIT.AUCTION_WINDOW_OPEN,
+    AuctionWindowClose = SOUNDKIT.AUCTION_WINDOW_CLOSE,
+    RaidWarning = SOUNDKIT.RAID_WARNING,
+    ReadyCheck = SOUNDKIT.READY_CHECK,
+  }
+
+  if soundKitIds[config.aurabeginsound] ~= nil then
+    updateConfig("aurabeginsound", soundKitIds[config.aurabeginsound])
+  end
+
+  if soundKitIds[config.auraendsound] ~= nil then
+    updateConfig("auraendsound", soundKitIds[config.auraendsound])
+  end
+end
+
 local function eventHandler(self, event, unit, ...)
   if event == "UNIT_AURA" then
     auraUpdated(self, event, unit)
@@ -716,6 +738,7 @@ local function eventHandler(self, event, unit, ...)
     auras = savedAuras()
     addNewDefaults()
     config = savedConfig()
+    updateSoundConfig()
     createOptionsPanel()
     setFontStyle(config.fontstyle)
     setFontAlignment(config.fontalignment)
