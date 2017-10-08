@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.4.2
+- added Grounding Totem to default list
+
 v1.4.1
 - added additional sounds options for aura begin/end
 - updated sounds to use SoundKitIDs instead of strings

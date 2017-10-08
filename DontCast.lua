@@ -154,6 +154,7 @@ local function defaultMagicalAuras()
     204018, -- Blessing of Spellwarding
     31224,  -- Cloak of Shadows
     122783, -- Diffuse Magic
+    8178,   -- Grounding Totem
     212295, -- Nether Ward
     23920,  -- Spell Reflection
   }
