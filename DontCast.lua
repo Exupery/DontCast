@@ -19,6 +19,8 @@ local BASE = "base"
 local MAGICAL = "magical"
 local PHYSICAL = "physical"
 
+local MAX_AURAS = 40
+
 local function colorPrint(msg)
   print("|cffb2b2b2"..msg)
 end
@@ -299,6 +301,16 @@ local function displayCountdown(duration)
   cdTextFrame:SetText(txt)
 end
 
+local function unitInSmoke(unit, localalizedSmokeBomb)
+  for i = 1, MAX_AURAS do
+    local name = UnitDebuff(unit, i)
+    if name == localalizedSmokeBomb then
+      return true
+    end
+  end
+  return false
+end
+
 local function isValid(name)
   if auras[name] == nil or auras[name] == false then
     return false
@@ -308,16 +320,19 @@ local function isValid(name)
   local localalizedTouchOfKarma = GetSpellInfo(122470)
   if (name == localalizedSmokeBomb) then
     --only concerned with Smoke Bomb when player NOT also in smoke
-    local targetInSmoke = UnitDebuff("target", localalizedSmokeBomb)
-    local playerInSmoke = UnitDebuff("player", localalizedSmokeBomb)
+    local targetInSmoke = unitInSmoke("target", localalizedSmokeBomb)
+    local playerInSmoke = unitInSmoke("player", localalizedSmokeBomb)
     return (targetInSmoke and not playerInSmoke) or (not targetInSmoke and playerInSmoke)
   elseif (name == localalizedTouchOfKarma) then
-    --only display ToK if player is recipient of debuff from target
-    local _, _, _, _, _, _, _, caster = UnitDebuff("player", localalizedTouchOfKarma)
-    return caster == "target"
-  else
-    return true
+    --only display ToK if target has the buff, i.e. not recipients of the ToK dot debuff
+    for i = 1, MAX_AURAS do
+      local buffName = UnitBuff("target", i)
+      if buffName == localalizedTouchOfKarma then return true end
+    end
+    return false
   end
+
+  return true
 end
 
 local function targetIsHostile()
@@ -327,12 +342,12 @@ end
 local function auraUpdated(self, event, unit, ...)
   if unit == "target" and targetIsHostile() then
     local hasAura = false
-    for aura, _ in pairs(auras) do
-      local name, rank, icon, count, type, dur, expTime = UnitBuff(unit, aura)
+    for i = 1, MAX_AURAS do
+      local name, icon = UnitBuff(unit, i)
       if not name then
-        name, rank, icon, count, type, dur, expTime = UnitDebuff(unit, aura)
+        name, icon = UnitDebuff(unit, i)
       end
-      if name and isValid(name) then
+      if name and isValid(name) and not hasAura then
         textFrame:SetText(name)
         iconFrame:SetTexture(icon)
         if not mainFrame:IsShown() and config.aurabeginsound ~= "" then
@@ -369,12 +384,14 @@ local function onUpdate(self, elapsed)
   if updCtr > 0.1 and mainFrame:IsShown() then
     local aura = textFrame:GetText()
     if aura then
-      local _, _, _, _, _, _, expTime = UnitBuff("target", aura)
-      if not expTime then
-        _, _, _, _, _, _, expTime = UnitDebuff("target", aura)
-      end
-      if expTime then
-        displayCountdown(expTime - GetTime())
+      for i = 1, MAX_AURAS do
+        local name, _, _, _, _, expTime = UnitBuff("target", i)
+        if not expTime then
+          name, _, _, _, _, expTime = UnitDebuff("target", i)
+        end
+        if name == aura and expTime ~= nil then
+          displayCountdown(expTime - GetTime())
+        end
       end
     end
     updCtr = 0
@@ -765,6 +782,10 @@ end
 function loadDontCast(self, text, icon, cdText)
   if self and text and icon and cdText then
     mainFrame = self
+    textFrame = text
+    iconFrame = icon
+    cdTextFrame = cdText
+
     mainFrame:SetClampedToScreen(true)
     mainFrame:SetMovable(true)
     mainFrame:RegisterForDrag("LeftButton", "RightButton")
@@ -789,10 +810,6 @@ function loadDontCast(self, text, icon, cdText)
     resizeButton:SetScript("OnMouseUp", function()
       mainFrame:StopMovingOrSizing()
     end)
-
-    textFrame = text
-    iconFrame = icon
-    cdTextFrame = cdText
 
     local eventFrame = CreateFrame("Frame", "DontCastEventFrame", UIParent)
     eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")

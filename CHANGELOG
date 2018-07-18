@@ -1,6 +1,10 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.4.3
+- updated for 8.0
+- once again (hopefully for reals this time!) fixed a bug where Touch of Karma could show for the debuffed recipient instead of the buffed Monk
+
 v1.4.2
 - added Grounding Totem to default list
 
