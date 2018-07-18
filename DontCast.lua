@@ -312,8 +312,8 @@ local function isValid(name)
     local playerInSmoke = UnitDebuff("player", localalizedSmokeBomb)
     return (targetInSmoke and not playerInSmoke) or (not targetInSmoke and playerInSmoke)
   elseif (name == localalizedTouchOfKarma) then
-    --only display ToK for buffed Monk, not the recipient
-    local _, _, _, _, _, _, _, caster = UnitBuff("target", localalizedTouchOfKarma)
+    --only display ToK if player is recipient of debuff from target
+    local _, _, _, _, _, _, _, caster = UnitDebuff("player", localalizedTouchOfKarma)
     return caster == "target"
   else
     return true
