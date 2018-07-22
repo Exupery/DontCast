@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.4.4
+- fixed duplicate object name errors from dropdown menu library
+
 v1.4.3
 - updated for 8.0
 - once again (hopefully for reals this time!) fixed a bug where Touch of Karma could show for the debuffed recipient instead of the buffed Monk

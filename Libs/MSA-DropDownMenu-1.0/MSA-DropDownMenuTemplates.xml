@@ -1,6 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
-	<Button name="MSA_DropDownMenuButtonTemplate" virtual="true">
+	<Button name="DC_DropDownMenuButtonTemplate" virtual="true">
 		<Size x="100" y="16"/>
 		<Layers>
 			<Layer level="BACKGROUND">
@@ -100,7 +100,7 @@
 					</OnClick>
 					<OnEnter>
 						local level =  self:GetParent():GetParent():GetID() + 1;
-						local listFrame = _G["MSA_DropDownList"..level];
+						local listFrame = _G["DC_DropDownList"..level];
 						if ( not listFrame or not listFrame:IsShown() or select(2, listFrame:GetPoint()) ~= self ) then
 							MSA_ToggleDropDownMenu(level, self:GetParent().value, nil, nil, nil, nil, self:GetParent().menuList, self);
 						end
@@ -155,7 +155,7 @@
 			<OnEnter>
 				if ( self.hasArrow ) then
 					local level =  self:GetParent():GetID() + 1;
-					local listFrame = _G["MSA_DropDownList"..level];
+					local listFrame = _G["DC_DropDownList"..level];
 					if ( not listFrame or not listFrame:IsShown() or select(2, listFrame:GetPoint()) ~= self ) then
 						MSA_ToggleDropDownMenu(self:GetParent():GetID() + 1, self.value, nil, nil, nil, nil, self.menuList, self);
 					end
@@ -198,7 +198,7 @@
 		<HighlightFont style="GameFontHighlightSmallLeft"/>
 		<DisabledFont style="GameFontDisableSmallLeft"/>
 	</Button>
-	<Button name="MSA_DropDownListTemplate" hidden="true" frameStrata="DIALOG" enableMouse="true" virtual="true">
+	<Button name="DC_DropDownListTemplate" hidden="true" frameStrata="DIALOG" enableMouse="true" virtual="true">
 		<Frames>
 			<Frame name="$parentBackdrop" setAllPoints="true">
 				<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background-Dark" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
@@ -232,14 +232,14 @@
 					</OnLoad>
 				</Scripts>
 			</Frame>
-			<Button name="$parentButton1" inherits="MSA_DropDownMenuButtonTemplate" id="1"/>
-			<Button name="$parentButton2" inherits="MSA_DropDownMenuButtonTemplate" id="2"/>
-			<Button name="$parentButton3" inherits="MSA_DropDownMenuButtonTemplate" id="3"/>
-			<Button name="$parentButton4" inherits="MSA_DropDownMenuButtonTemplate" id="4"/>
-			<Button name="$parentButton5" inherits="MSA_DropDownMenuButtonTemplate" id="5"/>
-			<Button name="$parentButton6" inherits="MSA_DropDownMenuButtonTemplate" id="6"/>
-			<Button name="$parentButton7" inherits="MSA_DropDownMenuButtonTemplate" id="7"/>
-			<Button name="$parentButton8" inherits="MSA_DropDownMenuButtonTemplate" id="8"/>
+			<Button name="$parentButton1" inherits="DC_DropDownMenuButtonTemplate" id="1"/>
+			<Button name="$parentButton2" inherits="DC_DropDownMenuButtonTemplate" id="2"/>
+			<Button name="$parentButton3" inherits="DC_DropDownMenuButtonTemplate" id="3"/>
+			<Button name="$parentButton4" inherits="DC_DropDownMenuButtonTemplate" id="4"/>
+			<Button name="$parentButton5" inherits="DC_DropDownMenuButtonTemplate" id="5"/>
+			<Button name="$parentButton6" inherits="DC_DropDownMenuButtonTemplate" id="6"/>
+			<Button name="$parentButton7" inherits="DC_DropDownMenuButtonTemplate" id="7"/>
+			<Button name="$parentButton8" inherits="DC_DropDownMenuButtonTemplate" id="8"/>
 		</Frames>
 		<Scripts>
 			<OnClick>
@@ -265,7 +265,7 @@
 				end
 				self.showTimer = nil;
 				if ( self:GetID() > 1 ) then
-					self.parent = _G["MSA_DropDownList"..(self:GetID() - 1)];
+					self.parent = _G["DC_DropDownList"..(self:GetID() - 1)];
 				end
 			</OnShow>
 			<OnHide>
@@ -273,7 +273,7 @@
 			</OnHide>
 		</Scripts>
 	</Button>
-	<Frame name="MSA_DropDownMenuTemplate" virtual="true">
+	<Frame name="DC_DropDownMenuTemplate" virtual="true">
 		<Size>
 			<AbsDimension x="40" y="32"/>
 		</Size>

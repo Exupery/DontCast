@@ -64,12 +64,12 @@ function MSA_DropDownMenu_InitializeHelper(frame)
 	-- Hide all the buttons
 	local button, dropDownList;
 	for i = 1, MSA_DROPDOWNMENU_MAXLEVELS, 1 do
-		dropDownList = _G["MSA_DropDownList"..i];
+		dropDownList = _G["DC_DropDownList"..i];
 		if ( i >= MSA_DROPDOWNMENU_MENU_LEVEL or frame ~= MSA_DROPDOWNMENU_OPEN_MENU ) then
 			dropDownList.numButtons = 0;
 			dropDownList.maxWidth = 0;
 			for j=1, MSA_DROPDOWNMENU_MAXBUTTONS, 1 do
-				button = _G["MSA_DropDownList"..i.."Button"..j];
+				button = _G["DC_DropDownList"..i.."Button"..j];
 				button:Hide();
 			end
 			dropDownList:Hide();
@@ -94,7 +94,7 @@ function MSA_DropDownMenu_Initialize(frame, initFunction, displayMode, level, me
 		level = 1;
 	end
 
-	local dropDownList = _G["MSA_DropDownList"..level]
+	local dropDownList = _G["DC_DropDownList"..level]
 	dropDownList.dropdown = frame;
 	dropDownList.shouldRefresh = true;
 
@@ -224,7 +224,7 @@ end
 function MSA_DropDownMenu_CreateFrames(level, index)
 	while ( level > MSA_DROPDOWNMENU_MAXLEVELS ) do
 		MSA_DROPDOWNMENU_MAXLEVELS = MSA_DROPDOWNMENU_MAXLEVELS + 1;
-		local newList = CreateFrame("Button", "MSA_DropDownList"..MSA_DROPDOWNMENU_MAXLEVELS, nil, "MSA_DropDownListTemplate");
+		local newList = CreateFrame("Button", "DC_DropDownList"..MSA_DROPDOWNMENU_MAXLEVELS, nil, "DC_DropDownListTemplate");
 		newList:SetFrameStrata("FULLSCREEN_DIALOG");
 		newList:SetToplevel(true);
 		newList:Hide();
@@ -232,7 +232,7 @@ function MSA_DropDownMenu_CreateFrames(level, index)
 		newList:SetWidth(180)
 		newList:SetHeight(10)
 		for i=MSA_DROPDOWNMENU_MINBUTTONS+1, MSA_DROPDOWNMENU_MAXBUTTONS do
-			local newButton = CreateFrame("Button", "MSA_DropDownList"..MSA_DROPDOWNMENU_MAXLEVELS.."Button"..i, newList, "MSA_DropDownMenuButtonTemplate");
+			local newButton = CreateFrame("Button", "DC_DropDownList"..MSA_DROPDOWNMENU_MAXLEVELS.."Button"..i, newList, "DC_DropDownMenuButtonTemplate");
 			newButton:SetID(i);
 		end
 	end
@@ -240,7 +240,7 @@ function MSA_DropDownMenu_CreateFrames(level, index)
 	while ( index > MSA_DROPDOWNMENU_MAXBUTTONS ) do
 		MSA_DROPDOWNMENU_MAXBUTTONS = MSA_DROPDOWNMENU_MAXBUTTONS + 1;
 		for i=1, MSA_DROPDOWNMENU_MAXLEVELS do
-			local newButton = CreateFrame("Button", "MSA_DropDownList"..i.."Button"..MSA_DROPDOWNMENU_MAXBUTTONS, _G["MSA_DropDownList"..i], "MSA_DropDownMenuButtonTemplate");
+			local newButton = CreateFrame("Button", "DC_DropDownList"..i.."Button"..MSA_DROPDOWNMENU_MAXBUTTONS, _G["DC_DropDownList"..i], "DC_DropDownMenuButtonTemplate");
 			newButton:SetID(MSA_DROPDOWNMENU_MAXBUTTONS);
 		end
 	end
@@ -292,7 +292,7 @@ function MSA_DropDownMenu_AddButton(info, level)
 		level = 1;
 	end
 
-	local listFrame = _G["MSA_DropDownList"..level];
+	local listFrame = _G["DC_DropDownList"..level];
 	local index = listFrame and (listFrame.numButtons + 1) or 1;
 	local width;
 
@@ -300,7 +300,7 @@ function MSA_DropDownMenu_AddButton(info, level)
 	MSA_DropDownMenuDelegate:SetAttribute("createframes-index", index);
 	MSA_DropDownMenuDelegate:SetAttribute("createframes", true);
 
-	listFrame = listFrame or _G["MSA_DropDownList"..level];
+	listFrame = listFrame or _G["DC_DropDownList"..level];
 	local listFrameName = listFrame:GetName();
 
 	-- Set the number of buttons in the listframe
@@ -540,7 +540,7 @@ function MSA_DropDownMenu_AddButton(info, level)
 	-- If has a colorswatch, show it and vertex color it
 	local colorSwatch = _G[listFrameName.."Button"..index.."ColorSwatch"];
 	if ( info.hasColorSwatch ) then
-		_G["MSA_DropDownList"..level.."Button"..index.."ColorSwatch".."NormalTexture"]:SetVertexColor(info.r, info.g, info.b);
+		_G["DC_DropDownList"..level.."Button"..index.."ColorSwatch".."NormalTexture"]:SetVertexColor(info.r, info.g, info.b);
 		button.r = info.r;
 		button.g = info.g;
 		button.b = info.b;
@@ -616,11 +616,11 @@ function MSA_DropDownMenu_Refresh(frame, useValue, dropdownLevel)
 		dropdownLevel = MSA_DROPDOWNMENU_MENU_LEVEL;
 	end
 
-	local listFrame = _G["MSA_DropDownList"..dropdownLevel];
+	local listFrame = _G["DC_DropDownList"..dropdownLevel];
 	listFrame.numButtons = listFrame.numButtons or 0;
 	-- Just redraws the existing menu
 	for i=1, MSA_DROPDOWNMENU_MAXBUTTONS do
-		button = _G["MSA_DropDownList"..dropdownLevel.."Button"..i];
+		button = _G["DC_DropDownList"..dropdownLevel.."Button"..i];
 		checked = nil;
 
 		if(i <= listFrame.numButtons) then
@@ -645,8 +645,8 @@ function MSA_DropDownMenu_Refresh(frame, useValue, dropdownLevel)
 
 		if not button.notCheckable and button:IsShown() then
 			-- If checked show check image
-			checkImage = _G["MSA_DropDownList"..dropdownLevel.."Button"..i.."Check"];
-			uncheckImage = _G["MSA_DropDownList"..dropdownLevel.."Button"..i.."UnCheck"];
+			checkImage = _G["DC_DropDownList"..dropdownLevel.."Button"..i.."Check"];
+			uncheckImage = _G["DC_DropDownList"..dropdownLevel.."Button"..i.."UnCheck"];
 			if ( checked ) then
 				somethingChecked = true;
 				local icon = _G[frame:GetName().."Icon"];
@@ -681,16 +681,16 @@ function MSA_DropDownMenu_Refresh(frame, useValue, dropdownLevel)
 	end
 	if (not frame.noResize) then
 		for i=1, MSA_DROPDOWNMENU_MAXBUTTONS do
-			button = _G["MSA_DropDownList"..dropdownLevel.."Button"..i];
+			button = _G["DC_DropDownList"..dropdownLevel.."Button"..i];
 			button:SetWidth(maxWidth);
 		end
-		MSA_DropDownMenu_RefreshDropDownSize(_G["MSA_DropDownList"..dropdownLevel]);
+		MSA_DropDownMenu_RefreshDropDownSize(_G["DC_DropDownList"..dropdownLevel]);
 	end
 end
 
 function MSA_DropDownMenu_RefreshAll(frame, useValue)
 	for dropdownLevel = MSA_DROPDOWNMENU_MENU_LEVEL, 2, -1 do
-		local listFrame = _G["MSA_DropDownList"..dropdownLevel];
+		local listFrame = _G["DC_DropDownList"..dropdownLevel];
 		if ( listFrame:IsShown() ) then
 			MSA_DropDownMenu_Refresh(frame, nil, dropdownLevel);
 		end
@@ -752,7 +752,7 @@ function MSA_DropDownMenu_GetSelectedID(frame)
 		-- If no explicit selectedID then try to send the id of a selected value or name
 		local button;
 		for i=1, MSA_DROPDOWNMENU_MAXBUTTONS do
-			button = _G["MSA_DropDownList"..MSA_DROPDOWNMENU_MENU_LEVEL.."Button"..i];
+			button = _G["DC_DropDownList"..MSA_DROPDOWNMENU_MENU_LEVEL.."Button"..i];
 			-- See if checked or not
 			if ( MSA_DropDownMenu_GetSelectedName(frame) ) then
 				if ( button:GetText() == MSA_DropDownMenu_GetSelectedName(frame) ) then
@@ -817,7 +817,7 @@ function MSA_DropDownMenuButton_OnClick(self)
 end
 
 function MSA_HideDropDownMenu(level)
-	local listFrame = _G["MSA_DropDownList"..level];
+	local listFrame = _G["DC_DropDownList"..level];
 	listFrame:Hide();
 end
 
@@ -830,8 +830,8 @@ function MSA_ToggleDropDownMenu(level, value, dropDownFrame, anchorName, xOffset
 	MSA_DropDownMenuDelegate:SetAttribute("createframes", true);
 	MSA_DROPDOWNMENU_MENU_LEVEL = level;
 	MSA_DROPDOWNMENU_MENU_VALUE = value;
-	local listFrame = _G["MSA_DropDownList"..level];
-	local listFrameName = "MSA_DropDownList"..level;
+	local listFrame = _G["DC_DropDownList"..level];
+	local listFrameName = "DC_DropDownList"..level;
 	local listFrameBlizz = _G["DropDownList1"];
 	local tempFrame;
 	local point, relativePoint, relativeTo;
@@ -941,7 +941,7 @@ function MSA_ToggleDropDownMenu(level, value, dropDownFrame, anchorName, xOffset
 			end
 			listFrame:ClearAllPoints();
 			-- If this is a dropdown button, not the arrow anchor it to itself
-			if ( strsub(button:GetParent():GetName(), 0,16) == "MSA_DropDownList" and strlen(button:GetParent():GetName()) == 17 ) then
+			if ( strsub(button:GetParent():GetName(), 0,16) == "DC_DropDownList" and strlen(button:GetParent():GetName()) == 17 ) then
 				anchorFrame = button;
 			else
 				anchorFrame = button:GetParent();
@@ -1036,7 +1036,7 @@ function MSA_ToggleDropDownMenu(level, value, dropDownFrame, anchorName, xOffset
 			end
 
 			listFrame:ClearAllPoints();
-			listFrame.parentLevel = tonumber(strmatch(anchorFrame:GetName(), "MSA_DropDownList(%d+)"));
+			listFrame.parentLevel = tonumber(strmatch(anchorFrame:GetName(), "DC_DropDownList(%d+)"));
 			listFrame.parentID = anchorFrame:GetID();
 			listFrame:SetPoint(point, anchorFrame, relativePoint, xOffset, yOffset);
 		end
@@ -1050,7 +1050,7 @@ end
 
 if ToggleDropDownMenu then
 	hooksecurefunc("ToggleDropDownMenu", function(level, value, dropDownFrame, anchorName, xOffset, yOffset, menuList, button, autoHideDelay)
-		local listFrameMSA = _G["MSA_DropDownList1"];
+		local listFrameMSA = _G["DC_DropDownList1"];
 		if ( listFrameMSA:IsShown() ) then
 			listFrameMSA:Hide();
 		end
@@ -1062,7 +1062,7 @@ function MSA_CloseDropDownMenus(level)
 		level = 1;
 	end
 	for i=level, MSA_DROPDOWNMENU_MAXLEVELS do
-		_G["MSA_DropDownList"..i]:Hide();
+		_G["DC_DropDownList"..i]:Hide();
 	end
 end
 
@@ -1123,12 +1123,12 @@ function MSA_DropDownMenu_ClearAll(frame)
 
 	local button, checkImage, uncheckImage;
 	for i=1, MSA_DROPDOWNMENU_MAXBUTTONS do
-		button = _G["MSA_DropDownList"..MSA_DROPDOWNMENU_MENU_LEVEL.."Button"..i];
+		button = _G["DC_DropDownList"..MSA_DROPDOWNMENU_MENU_LEVEL.."Button"..i];
 		button:UnlockHighlight();
 
-		checkImage = _G["MSA_DropDownList"..MSA_DROPDOWNMENU_MENU_LEVEL.."Button"..i.."Check"];
+		checkImage = _G["DC_DropDownList"..MSA_DROPDOWNMENU_MENU_LEVEL.."Button"..i.."Check"];
 		checkImage:Hide();
-		uncheckImage = _G["MSA_DropDownList"..MSA_DROPDOWNMENU_MENU_LEVEL.."Button"..i.."UnCheck"];
+		uncheckImage = _G["DC_DropDownList"..MSA_DROPDOWNMENU_MENU_LEVEL.."Button"..i.."UnCheck"];
 		uncheckImage:Hide();
 	end
 end
@@ -1182,15 +1182,15 @@ function MSA_DropDownMenuButton_OpenColorPicker(self, button)
 end
 
 function MSA_DropDownMenu_DisableButton(level, id)
-	_G["MSA_DropDownList"..level.."Button"..id]:Disable();
+	_G["DC_DropDownList"..level.."Button"..id]:Disable();
 end
 
 function MSA_DropDownMenu_EnableButton(level, id)
-	_G["MSA_DropDownList"..level.."Button"..id]:Enable();
+	_G["DC_DropDownList"..level.."Button"..id]:Enable();
 end
 
 function MSA_DropDownMenu_SetButtonText(level, id, text, colorCode)
-	local button = _G["MSA_DropDownList"..level.."Button"..id];
+	local button = _G["DC_DropDownList"..level.."Button"..id];
 	if ( colorCode) then
 		button:SetText(colorCode..text.."|r");
 	else
@@ -1199,11 +1199,11 @@ function MSA_DropDownMenu_SetButtonText(level, id, text, colorCode)
 end
 
 function MSA_DropDownMenu_SetButtonNotClickable(level, id)
-	_G["MSA_DropDownList"..level.."Button"..id]:SetDisabledFontObject(GameFontHighlightSmallLeft);
+	_G["DC_DropDownList"..level.."Button"..id]:SetDisabledFontObject(GameFontHighlightSmallLeft);
 end
 
 function MSA_DropDownMenu_SetButtonClickable(level, id)
-	_G["MSA_DropDownList"..level.."Button"..id]:SetDisabledFontObject(GameFontDisableSmallLeft);
+	_G["DC_DropDownList"..level.."Button"..id]:SetDisabledFontObject(GameFontDisableSmallLeft);
 end
 
 function MSA_DropDownMenu_DisableDropDown(dropDown)
@@ -1232,9 +1232,9 @@ end
 
 function MSA_DropDownMenu_GetValue(id)
 	--Only works if the dropdown has just been initialized, lame, I know =(
-	local button = _G["MSA_DropDownList1Button"..id];
+	local button = _G["DC_DropDownList1Button"..id];
 	if ( button ) then
-		return _G["MSA_DropDownList1Button"..id].value;
+		return _G["DC_DropDownList1Button"..id].value;
 	else
 		return nil;
 	end
@@ -1259,8 +1259,8 @@ local function LoadSkin_ElvUI()
 	local E = unpack(_G.ElvUI)
 	if E.private.skins.blizzard.misc ~= true then return end
 	for i = 1, MSA_DROPDOWNMENU_MAXLEVELS do
-		_G["MSA_DropDownList"..i.."MenuBackdrop"]:SetTemplate("Transparent")
-		_G["MSA_DropDownList"..i.."Backdrop"]:SetTemplate("Transparent")
+		_G["DC_DropDownList"..i.."MenuBackdrop"]:SetTemplate("Transparent")
+		_G["DC_DropDownList"..i.."Backdrop"]:SetTemplate("Transparent")
 	end
 end
 
@@ -1269,11 +1269,11 @@ local function LoadSkin_Tukui()
 	if not IsAddOnLoaded("Tukui") then return end
 	local Backdrop
 	for i = 1, MSA_DROPDOWNMENU_MAXLEVELS do
-		Backdrop = _G["MSA_DropDownList"..i.."MenuBackdrop"]
+		Backdrop = _G["DC_DropDownList"..i.."MenuBackdrop"]
 		Backdrop:SetTemplate("Default")
 		Backdrop:CreateShadow()
 		Backdrop.IsSkinned = true
-		Backdrop = _G["MSA_DropDownList"..i.."Backdrop"]
+		Backdrop = _G["DC_DropDownList"..i.."Backdrop"]
 		Backdrop:SetTemplate("Default")
 		Backdrop:CreateShadow()
 		Backdrop.IsSkinned = true

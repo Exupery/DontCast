@@ -526,7 +526,7 @@ local function auraSoundDropDownOnLoad(soundSelectFunction, frame, setTo)
 end
 
 local function createDropDown(name, parent)
-  local dropdown = CreateFrame("Button", "DontCast"..name.."DropDown", parent, "MSA_DropDownMenuTemplate")
+  local dropdown = CreateFrame("Button", "DontCast"..name.."DropDown", parent, "DC_DropDownMenuTemplate")
   dropdown:ClearAllPoints()
   return dropdown
 end
