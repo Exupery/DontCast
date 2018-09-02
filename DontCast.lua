@@ -10,6 +10,7 @@ local resizeButton = nil
 local playerServer = nil
 local config = {}
 local tempConfig = {}
+local profiles = {}
 local auras = {}
 
 local upAuras = {}
@@ -20,6 +21,43 @@ local MAGICAL = "magical"
 local PHYSICAL = "physical"
 
 local MAX_AURAS = 40
+
+local SOUNDS = {
+  None = "",
+  ChestUnlock1 = SOUNDKIT.UI_GARRISON_COMMAND_TABLE_CHEST_UNLOCK,
+  ChestUnlock2 = SOUNDKIT.UI_GARRISON_COMMAND_TABLE_CHEST_UNLOCK_GOLD_SUCCESS,
+  DoubleBell = SOUNDKIT.AUCTION_WINDOW_CLOSE,
+  Ethereal1 = SOUNDKIT.UI_ETHEREAL_WINDOW_OPEN,
+  Ethereal2 = SOUNDKIT.UI_ETHEREAL_WINDOW_CLOSE,
+  Keys = SOUNDKIT.KEY_RING_OPEN,
+  MissionFail = SOUNDKIT.UI_GARRISON_MISSION_COMPLETE_ENCOUNTER_FAIL,
+  MissionSuccess = SOUNDKIT.UI_GARRISON_MISSION_COMPLETE_MISSION_SUCCESS,
+  Money = SOUNDKIT.MONEY_FRAME_OPEN,
+  PageTurn = SOUNDKIT.UI_TRANSMOG_PAGE_TURN,
+  PetBattle = SOUNDKIT.UI_PET_BATTLE_START,
+  RaidWarning = SOUNDKIT.RAID_WARNING,
+  ReadyCheck = SOUNDKIT.READY_CHECK,
+  Roar = SOUNDKIT.UI_VOID_STORAGE_UNLOCK,
+  SingleBell = SOUNDKIT.AUCTION_WINDOW_OPEN,
+  Ship1 = SOUNDKIT.UI_GARRISON_SHIPYARD_PLACE_DREADNOUGHT,
+  Ship2 = SOUNDKIT.UI_GARRISON_SHIPYARD_PLACE_SUBMARINE,
+  Ship3 = SOUNDKIT.UI_GARRISON_SHIPYARD_PLACE_LANDING_CRAFT,
+  ShipYard = SOUNDKIT.UI_GARRISON_SHIPYARD_START_MISSION,
+  Slam = SOUNDKIT.UI_BATTLEGROUND_COUNTDOWN_FINISHED,
+}
+
+local FONTS = {
+  Arial = "Fonts\\ARIALN.TTF",
+  FritzQuad = "Fonts\\FRIZQT__.TTF",
+  Morpheus = "Fonts\\MORPHEUS.ttf",
+  Skurri = "Fonts\\skurri.ttf"
+}
+
+local FONT_ALIGNMENTS = {
+  Left = "LEFT",
+  Center = "CENTER",
+  Right = "RIGHT"
+}
 
 local function colorPrint(msg)
   print("|cffb2b2b2"..msg)
@@ -65,11 +103,20 @@ end
 local function defaultConfig()
   return {
     threshold = 1.5,
-    fontstyle = "Fonts\\skurri.ttf",
-    fontalignment = "LEFT",
+    fontstyle = "Skurri",
+    fontalignment = "Left",
     aurabeginsound = "",
     auraendsound = ""
   }
+end
+
+local function swapConfigKeyValue(key, tbl)
+  local curValue = DontCastConfig[playerServer][key]
+  if tbl[curValue] == nil and curValue ~= "" then
+    for k, v in pairs(tbl) do
+      if string.lower(curValue) == string.lower(v) then DontCastConfig[playerServer][key] = k end
+    end
+  end
 end
 
 local function savedConfig()
@@ -102,6 +149,12 @@ local function savedConfig()
     if DontCastConfig[playerServer][k] == nil then DontCastConfig[playerServer][k] = v end
   end
 
+  -- update config to use table-based options for users with pre-table configs
+  swapConfigKeyValue("fontstyle", FONTS)
+  swapConfigKeyValue("fontalignment", FONT_ALIGNMENTS)
+  swapConfigKeyValue("aurabeginsound", SOUNDS)
+  swapConfigKeyValue("auraendsound", SOUNDS)
+
   return DontCastConfig[playerServer]
 end
 
@@ -115,12 +168,16 @@ local function updateConfig(key, value)
 end
 
 local function setFontStyle(style)
-  cdTextFrame:SetFont(style, mainFrame:GetHeight() * 0.6)
-  textFrame:SetFont(style, mainFrame:GetHeight() * 0.75)
+  local font = FONTS[style]
+  if not font then return end
+  cdTextFrame:SetFont(font, mainFrame:GetHeight() * 0.6)
+  textFrame:SetFont(font, mainFrame:GetHeight() * 0.75)
 end
 
 local function setFontAlignment(justification)
-  textFrame:SetJustifyH(justification)
+  local alignment = FONT_ALIGNMENTS[justification]
+  if not alignment then return end
+  textFrame:SetJustifyH(alignment)
 end
 
 local function addAurasToList(list, values)
@@ -350,8 +407,8 @@ local function auraUpdated(self, event, unit, ...)
       if name and isValid(name) and not hasAura then
         textFrame:SetText(name)
         iconFrame:SetTexture(icon)
-        if not mainFrame:IsShown() and config.aurabeginsound ~= "" then
-          PlaySound(config.aurabeginsound, "Master")
+        if not mainFrame:IsShown() and SOUNDS[config.aurabeginsound] ~= nil then
+          PlaySound(SOUNDS[config.aurabeginsound], "Master")
         end
         mainFrame:Show()
         hasAura = true
@@ -360,8 +417,8 @@ local function auraUpdated(self, event, unit, ...)
     end
     if not hasAura then
       if next(upAuras) ~= nil then
-        if config.auraendsound ~= "" then
-          PlaySound(config.auraendsound, "Master")
+        if SOUNDS[config.auraendsound] ~= nil then
+          PlaySound(SOUNDS[config.auraendsound], "Master")
         end
         upAuras = {}
       end
@@ -409,13 +466,11 @@ end
 local function fontStyleSelected(self)
   setFontStyle(self.value)
   tempConfig.fontstyle = self.value
-  Lib_UIDropDownMenu_SetSelectedID(optionsFrame.fontstyle, self:GetID())
 end
 
 local function fontAlignmentSelected(self)
   setFontAlignment(self.value)
   tempConfig.fontalignment = self.value
-  Lib_UIDropDownMenu_SetSelectedID(optionsFrame.fontalignment, self:GetID())
 end
 
 local function createButton(text, parent)
@@ -442,92 +497,32 @@ local function createInputBox(name, parent, defaultText)
   return box
 end
 
-local function createDropDownInfo(text, value, func)
-  local info = Lib_UIDropDownMenu_CreateInfo()
-  info.text = text
-  info.value = value
-  info.func = func
-
-  Lib_UIDropDownMenu_AddButton(info)
-end
-
-local function fontStyleDropDownOnLoad(frame, level, menuList)
-  local fonts = {
-    Arial = "Fonts\\ARIALN.TTF",
-    FritzQuad = "Fonts\\FRIZQT__.TTF",
-    Morpheus = "Fonts\\MORPHEUS.ttf",
-    Skurri = "Fonts\\skurri.ttf"
-  }
-
+local function sortedKeys(tbl)
   local sorted = {}
-  for k, v in pairs(fonts) do
+  for k, v in pairs(tbl) do
     table.insert(sorted, k)
   end
   table.sort(sorted)
-  for i, k in ipairs(sorted) do
-    createDropDownInfo(k, fonts[k], fontStyleSelected)
-  end
 
-  local selected = tempConfig.fontstyle ~= nil and tempConfig.fontstyle or config.fontstyle
-  Lib_UIDropDownMenu_SetSelectedValue(optionsFrame.fontstyle, selected)
+  return sorted
 end
 
-local function fontAlignmentDropDownOnLoad(frame, level, menuList)
-  local alignments = {
-    Left = "LEFT",
-    Center = "CENTER",
-    Right = "RIGHT"
-  }
-
-  for k, v in pairs(alignments) do
-    createDropDownInfo(k, v, fontAlignmentSelected)
-  end
-
-  local selected = tempConfig.fontalignment ~= nil and tempConfig.fontalignment or config.fontalignment
-  Lib_UIDropDownMenu_SetSelectedValue(optionsFrame.fontalignment, selected)
-end
-
-local function auraSoundDropDownOnLoad(soundSelectFunction, frame, setTo)
-  local sounds = {
-    None = "",
-    ChestUnlock1 = SOUNDKIT.UI_GARRISON_COMMAND_TABLE_CHEST_UNLOCK,
-    ChestUnlock2 = SOUNDKIT.UI_GARRISON_COMMAND_TABLE_CHEST_UNLOCK_GOLD_SUCCESS,
-    DoubleBell = SOUNDKIT.AUCTION_WINDOW_CLOSE,
-    Ethereal1 = SOUNDKIT.UI_ETHEREAL_WINDOW_OPEN,
-    Ethereal2 = SOUNDKIT.UI_ETHEREAL_WINDOW_CLOSE,
-    Keys = SOUNDKIT.KEY_RING_OPEN,
-    MissionFail = SOUNDKIT.UI_GARRISON_MISSION_COMPLETE_ENCOUNTER_FAIL,
-    MissionSuccess = SOUNDKIT.UI_GARRISON_MISSION_COMPLETE_MISSION_SUCCESS,
-    Money = SOUNDKIT.MONEY_FRAME_OPEN,
-    PageTurn = SOUNDKIT.UI_TRANSMOG_PAGE_TURN,
-    PetBattle = SOUNDKIT.UI_PET_BATTLE_START,
-    RaidWarning = SOUNDKIT.RAID_WARNING,
-    ReadyCheck = SOUNDKIT.READY_CHECK,
-    Roar = SOUNDKIT.UI_VOID_STORAGE_UNLOCK,
-    SingleBell = SOUNDKIT.AUCTION_WINDOW_OPEN,
-    Ship1 = SOUNDKIT.UI_GARRISON_SHIPYARD_PLACE_DREADNOUGHT,
-    Ship2 = SOUNDKIT.UI_GARRISON_SHIPYARD_PLACE_SUBMARINE,
-    Ship3 = SOUNDKIT.UI_GARRISON_SHIPYARD_PLACE_LANDING_CRAFT,
-    ShipYard = SOUNDKIT.UI_GARRISON_SHIPYARD_START_MISSION,
-    Slam = SOUNDKIT.UI_BATTLEGROUND_COUNTDOWN_FINISHED,
-  }
-
+local function auraSoundDropDownEntries()
   local sorted = {}
-  for k, v in pairs(sounds) do
+  for k, v in pairs(SOUNDS) do
     if k ~= "None" then table.insert(sorted, k) end
   end
   table.sort(sorted)
   table.insert(sorted, 1, "None")
-  for i, k in ipairs(sorted) do
-    createDropDownInfo(k, sounds[k], soundSelectFunction)
-  end
 
-  Lib_UIDropDownMenu_SetSelectedValue(frame, setTo)
+  return sorted
 end
 
-local function createDropDown(name, parent)
-  local dropdown = CreateFrame("Frame", name.."DropDown", parent, "Lib_UIDropDownMenuTemplate")
+local function createDropDown(name, parent, callback, tableValues, selectedValue)
+  local SelectBox = LibStub:GetLibrary("SelectBox")
+  local dropdown = SelectBox:Create(name, parent, 120, callback, function() return tableValues end, selectedValue)
   dropdown:ClearAllPoints()
+  dropdown:UpdateValue()
   return dropdown
 end
 
@@ -562,63 +557,71 @@ local function drawThresholdOptions(parent, xOffset, yOffset)
   parent.threshold:SetPoint("LEFT", label, "RIGHT", 10, 0)
 end
 
+local function getSelectedFontStyle()
+  return tempConfig.fontstyle ~= nil and tempConfig.fontstyle or config.fontstyle
+end
+
+local function getSelectedFontAlignment()
+  return tempConfig.fontalignment ~= nil and tempConfig.fontalignment or config.fontalignment
+end
+
 local function drawFontStyleOptions(parent, xOffset, yOffset)
   local label = createLabel("Font", parent, xOffset, yOffset)
 
-  parent.fontstyle = createDropDown("DontCastFontStyle", parent)
+  local fonts = sortedKeys(FONTS)
+  local selectedFont = getSelectedFontStyle()
+  parent.fontstyle = createDropDown("DontCastFontStyle", parent, fontStyleSelected, fonts, selectedFont)
   parent.fontstyle:SetPoint("LEFT", label, "RIGHT", 0, 0)
-  Lib_UIDropDownMenu_Initialize(parent.fontstyle, fontStyleDropDownOnLoad)
 
-  parent.fontalignment = createDropDown("DontCastFontAlignment", parent)
-  parent.fontalignment:SetPoint("LEFT", parent.fontstyle, "RIGHT", 110, 0)
-  Lib_UIDropDownMenu_Initialize(parent.fontalignment, fontAlignmentDropDownOnLoad)
+  local fontAlignments = sortedKeys(FONT_ALIGNMENTS)
+  local selectedAlign = getSelectedFontAlignment()
+  parent.fontalignment = createDropDown("DontCastFontAlignment", parent, fontAlignmentSelected, fontAlignments, selectedAlign)
+  parent.fontalignment:SetPoint("LEFT", parent.fontstyle, "RIGHT", 60, 0)
 end
 
 local function beginSoundSelected(self)
-  PlaySound(self.value, "Master")
+  if SOUNDS[self.value] ~= nil then PlaySound(SOUNDS[self.value], "Master") end
   tempConfig.aurabeginsound = self.value
-  Lib_UIDropDownMenu_SetSelectedID(optionsFrame.aurabeginsound, self:GetID())
 end
 
 local function endSoundSelected(self)
-  PlaySound(self.value, "Master")
+  if SOUNDS[self.value] ~= nil then PlaySound(SOUNDS[self.value], "Master") end
   tempConfig.auraendsound = self.value
-  Lib_UIDropDownMenu_SetSelectedID(optionsFrame.auraendsound, self:GetID())
 end
 
-local function beginSoundDropDownOnLoad()
-  local selected = tempConfig.aurabeginsound ~= nil and tempConfig.aurabeginsound or config.aurabeginsound
-  auraSoundDropDownOnLoad(beginSoundSelected, optionsFrame.aurabeginsound, selected)
+local function getSelectedBeginSound()
+  return tempConfig.aurabeginsound ~= nil and tempConfig.aurabeginsound or config.aurabeginsound
 end
 
-local function endSoundDropDownOnLoad()
-  local selected = tempConfig.auraendsound ~= nil and tempConfig.auraendsound or config.auraendsound
-  auraSoundDropDownOnLoad(endSoundSelected, optionsFrame.auraendsound, selected)
+local function getSelectedEndSound()
+  return tempConfig.auraendsound ~= nil and tempConfig.auraendsound or config.auraendsound
 end
 
 local function drawSoundOptions(parent, xOffset, yOffset)
+  local sounds = auraSoundDropDownEntries()
+
   local beginLabel = createLabel("Aura begins sound", parent, xOffset, yOffset)
-  parent.aurabeginsound = createDropDown("DontCastAuraBeginSound", parent)
+  local selectedBegin = getSelectedBeginSound()
+  parent.aurabeginsound = createDropDown("DontCastAuraBeginSound", parent, beginSoundSelected, sounds, selectedBegin)
   parent.aurabeginsound:SetPoint("LEFT", beginLabel, "RIGHT", 0, 0)
-  Lib_UIDropDownMenu_SetWidth(parent.aurabeginsound, 140)
-  Lib_UIDropDownMenu_Initialize(parent.aurabeginsound, beginSoundDropDownOnLoad)
+  parent.aurabeginsound:SetWidth(140)
 
   local endLabel = createLabel("Aura ends sound", parent, xOffset, yOffset - 40)
-  parent.auraendsound = createDropDown("DontCastAuraEndSound", parent)
+  local selectedEnd = getSelectedEndSound()
+  parent.auraendsound = createDropDown("DontCastAuraEndSound", parent, endSoundSelected, sounds, selectedEnd)
   parent.auraendsound:SetPoint("LEFT", endLabel, "RIGHT", 0, 0)
-  Lib_UIDropDownMenu_SetWidth(parent.auraendsound, 140)
-  Lib_UIDropDownMenu_Initialize(parent.auraendsound, endSoundDropDownOnLoad)
+  parent.auraendsound:SetWidth(140)
 end
 
 local function reloadDropDowns()
-  fontStyleDropDownOnLoad()
-  fontAlignmentDropDownOnLoad()
-  beginSoundDropDownOnLoad()
-  endSoundDropDownOnLoad()
+  optionsFrame.fontstyle:SetText(getSelectedFontStyle())
+  optionsFrame.fontalignment:SetText(getSelectedFontAlignment())
+  optionsFrame.aurabeginsound:SetText(getSelectedBeginSound())
+  optionsFrame.auraendsound:SetText(getSelectedEndSound())
 end
 
 local function copyConfigSelected(self)
-  tempConfig.copyconfig = self.value
+  tempConfig.copyconfig = profiles[self.value]
   for k, v in pairs(self.value) do
     tempConfig[k] = v
   end
@@ -626,38 +629,28 @@ local function copyConfigSelected(self)
   setFontStyle(tempConfig.fontstyle)
   setFontAlignment(tempConfig.fontalignment)
   reloadDropDowns()
-  Lib_UIDropDownMenu_SetSelectedID(optionsFrame.copyconfig, self:GetID())
 end
 
-local function copyConfigDropDownOnLoad()
+local function copyConfigEntries()
   local sorted = {}
   for k, _ in pairs(DontCastConfig) do
     if k ~= "OLDGLOBAL" then table.insert(sorted, k) end
   end
   table.sort(sorted)
-  for _, k in ipairs(sorted) do
-    createDropDownInfo(k, DontCastConfig[k], copyConfigSelected)
-  end
-
-  if tempConfig.copyconfig then
-    Lib_UIDropDownMenu_SetSelectedValue(optionsFrame.copyconfig, tempConfig.copyconfig)
-  else
-    Lib_UIDropDownMenu_SetSelectedName(optionsFrame.copyconfig, playerServer)
-  end
+  return sorted
 end
 
 local function drawCopyConfigOptions(parent, xOffset, yOffset)
   local label = createLabel("Copy configuration from", parent, xOffset, yOffset)
-  parent.copyconfig = createDropDown("DontCastCopyConfig", parent)
+  local selected = tempConfig.copyconfig ~= nil and tempConfig.copyconfig or playerServer
+  parent.copyconfig = createDropDown("DontCastCopyConfig", parent, copyConfigSelected, profiles, selected)
   parent.copyconfig:SetPoint("LEFT", label, "RIGHT", 0, 0)
-  Lib_UIDropDownMenu_SetWidth(parent.copyconfig, 225)
-  Lib_UIDropDownMenu_Initialize(parent.copyconfig, copyConfigDropDownOnLoad)
+  parent.copyconfig:SetWidth(225)
 end
 
 local function updateOptionsUI()
   setInputBoxText(optionsFrame.threshold, config.threshold)
   reloadDropDowns()
-  copyConfigDropDownOnLoad()
 end
 
 local function setThreshold(threshold, echo)
@@ -681,8 +674,8 @@ end
 
 local function saveOptions()
   setThreshold(optionsFrame.threshold:GetText(), false)
-  updateConfig("fontstyle", textFrame:GetFont())
-  updateConfig("fontalignment", textFrame:GetJustifyH())
+  updateConfig("fontstyle", getSelectedFontStyle())
+  updateConfig("fontalignment", getSelectedFontAlignment())
 
   if tempConfig.aurabeginsound ~= nil then
     updateConfig("aurabeginsound", tempConfig.aurabeginsound)
@@ -729,6 +722,8 @@ local function createOptionsPanel()
   optionsFrame.title:SetPoint("TOPLEFT", xOffset, -20)
   optionsFrame.title:SetText("DontCast Options")
 
+  profiles = copyConfigEntries()
+
   drawPositioningOptions(optionsFrame, xOffset, -50)
   drawThresholdOptions(optionsFrame, xOffset, -90)
   drawFontStyleOptions(optionsFrame, xOffset, -130)
@@ -740,13 +735,11 @@ end
 
 -- 7.3 changed the sound API to take a constant
 -- instead of a string to specify the sound to play,
--- update old config strings to appropriate constants
+-- update old config strings to current table keys
 local function updateSoundConfig()
   local soundKitIds = {
-    AuctionWindowOpen = SOUNDKIT.AUCTION_WINDOW_OPEN,
-    AuctionWindowClose = SOUNDKIT.AUCTION_WINDOW_CLOSE,
-    RaidWarning = SOUNDKIT.RAID_WARNING,
-    ReadyCheck = SOUNDKIT.READY_CHECK,
+    AuctionWindowOpen = "SingleBell",
+    AuctionWindowClose = "DoubleBell",
   }
 
   if soundKitIds[config.aurabeginsound] ~= nil then
