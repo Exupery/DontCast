@@ -499,7 +499,7 @@ end
 
 local function sortedKeys(tbl)
   local sorted = {}
-  for k, v in pairs(tbl) do
+  for k, _ in pairs(tbl) do
     table.insert(sorted, k)
   end
   table.sort(sorted)
@@ -621,8 +621,10 @@ local function reloadDropDowns()
 end
 
 local function copyConfigSelected(self)
-  tempConfig.copyconfig = profiles[self.value]
-  for k, v in pairs(self.value) do
+  tempConfig.copyconfig = self.value
+  local profileToCopy = profiles[self.value]
+  if not profileToCopy then return end
+  for k, v in pairs(profileToCopy) do
     tempConfig[k] = v
   end
   setInputBoxText(optionsFrame.threshold, tempConfig.threshold)
@@ -632,18 +634,18 @@ local function copyConfigSelected(self)
 end
 
 local function copyConfigEntries()
-  local sorted = {}
-  for k, _ in pairs(DontCastConfig) do
-    if k ~= "OLDGLOBAL" then table.insert(sorted, k) end
+  local tbl = {}
+  for k, v in pairs(DontCastConfig) do
+    if k ~= "OLDGLOBAL" then tbl[k] = v end
   end
-  table.sort(sorted)
-  return sorted
+  return tbl
 end
 
 local function drawCopyConfigOptions(parent, xOffset, yOffset)
   local label = createLabel("Copy configuration from", parent, xOffset, yOffset)
   local selected = tempConfig.copyconfig ~= nil and tempConfig.copyconfig or playerServer
-  parent.copyconfig = createDropDown("DontCastCopyConfig", parent, copyConfigSelected, profiles, selected)
+  local profileNames = sortedKeys(profiles)
+  parent.copyconfig = createDropDown("DontCastCopyConfig", parent, copyConfigSelected, profileNames, selected)
   parent.copyconfig:SetPoint("LEFT", label, "RIGHT", 0, 0)
   parent.copyconfig:SetWidth(225)
 end
