@@ -832,22 +832,22 @@ SlashCmdList["DONTCAST"] = function(cmd)
       lockFrame(true)
     elseif cmd == "center" then
       centerFrame()
-    elseif string.match(cmd, "add%s+%w+") then
+    elseif string.match(cmd, "add%s+.+") then
       local aura = string.match(cmd, "add%s+(.+)")
       if aura then
         addAura(aura, BASE)
       end
-    elseif string.match(cmd, "addm%s+%w+") then
+    elseif string.match(cmd, "addm%s+.+") then
       local aura = string.match(cmd, "addm%s+(.+)")
       if aura then
         addAura(aura, MAGICAL)
       end
-    elseif string.match(cmd, "addp%s+%w+") then
+    elseif string.match(cmd, "addp%s+.+") then
       local aura = string.match(cmd, "addp%s+(.+)")
       if aura then
         addAura(aura, PHYSICAL)
       end
-    elseif string.match(cmd, "remove%s+%w+") then
+    elseif string.match(cmd, "remove%s+.+") then
       local aura = string.match(cmd, "remove%s+(.+)")
       if aura then
         removeAura(aura)
