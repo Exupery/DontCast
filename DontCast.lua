@@ -236,7 +236,7 @@ local function defaultAuras()
   return defaults
 end
 
-local function isCasterOrHealer()
+local function isMagical()
   -- return early if spec not set yet (i.e. addon may get loaded before GetSpecialization returns non-nil value)
   -- defaulting to true since addon was originally written for casters but this shouldn't
   -- end up mattering as the auras assignment will get re-called when ACTIVE_TALENT_GROUP_CHANGED fires
@@ -246,7 +246,8 @@ local function isCasterOrHealer()
 
   local casterIds = {[62] = true, [63] = true, [64] = true, [102] = true, [258] = true, [262] = true, [265] = true, [266] = true, [267] = true}
 
-  local healerIds = {[65] = true, [105] = true, [256] = true, [257] = true, [264] = true, [270] = true}
+  -- Does not include Mistwalker (270) since physical-related warnings would be more helpful during Way of the Crane
+  local healerIds = {[65] = true, [105] = true, [256] = true, [257] = true, [264] = true}
 
   return casterIds[specId] or healerIds[specId]
 end
@@ -287,7 +288,7 @@ local function savedAuras()
 
   local specAuras = {}
   mergeTables(specAuras, DontCastAuras[BASE])
-  if isCasterOrHealer() then
+  if isMagical() then
     mergeTables(specAuras, DontCastAuras[MAGICAL])
   else
     mergeTables(specAuras, DontCastAuras[PHYSICAL])

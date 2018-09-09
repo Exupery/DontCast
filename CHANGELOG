@@ -3,6 +3,7 @@ DONTCAST CHANGE LOG
 
 v1.4.5
 - allow adding (and removing) of auras regardless of locale
+- include physical immunities in default list for Mistweaver Monks
 
 v1.4.4
 - fixed duplicate object name errors from dropdown menu library
