@@ -191,12 +191,14 @@ local function defaultBaseAuras()
   return {
     186265, -- Aspect of the Turtle
     33786,  -- Cyclone
+    108416, -- Dark Pact
     19263,  -- Deterrence
     47585,  -- Dispersion
     642,    -- Divine Shield
     228049, -- Guardian of the Forgotten Queen
     45438,  -- Ice Block
     221527, -- Imprison
+    116849, -- Life Cocoon
     196555, -- Netherwalk
     115078, -- Paralysis
     28272,  -- Polymorph

@@ -9,6 +9,7 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 * Blessing of Spellwarding (Magical mode only)
 * Cloak of Shadows (Magical mode only)
 * Cyclone
+* Dark Pact
 * Deterrence
 * Die by the Sword (Physical mode only)
 * Diffuse Magic (Magical mode only)
@@ -19,6 +20,7 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 * Guardian of the Forgotten Queen
 * Ice Block
 * Imprison
+* Life Cocoon
 * Nether Ward (Magical mode only)
 * Netherwalk
 * Paralysis

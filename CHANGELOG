@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.4.6
+- Dark Pact and Life Cocoon added to default aura list
+
 v1.4.5
 - allow adding (and removing) of auras regardless of locale
 - include physical immunities in default list for Mistweaver Monks
