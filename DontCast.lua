@@ -204,7 +204,9 @@ local function defaultBaseAuras()
     28272,  -- Polymorph
     184662, -- Shield of Vengeance
     76577,  -- Smoke Bomb
+    263648, -- Soul Barrier
     198111, -- Temporal Shield
+    219809, -- Tombstone
     122470, -- Touch of Karma
   }
 end
@@ -227,6 +229,7 @@ local function defaultPhysicalAuras()
     118038, -- Die by the Sword
     210918, -- Ethereal Form
     199754, -- Riposte
+    236696, -- Thorns
   }
 end
 
