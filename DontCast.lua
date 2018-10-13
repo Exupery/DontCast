@@ -50,7 +50,11 @@ local FONTS = {
   Arial = "Fonts\\ARIALN.TTF",
   FritzQuad = "Fonts\\FRIZQT__.TTF",
   Morpheus = "Fonts\\MORPHEUS.ttf",
-  Skurri = "Fonts\\skurri.ttf"
+  Skurri = "Fonts\\skurri.ttf",
+  koKR = "Fonts\\2002.ttf",
+  ruRU = "Fonts\\ARIALN.TTF",
+  zhCN = "Fonts\\ARKai_T.ttf",
+  zhTW = "Fonts\\bkAI00M.ttf",
 }
 
 local FONT_ALIGNMENTS = {
