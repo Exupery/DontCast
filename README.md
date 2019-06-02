@@ -16,6 +16,7 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 * Dispersion
 * Divine Shield
 * Ethereal Form (Physical mode only)
+* Evasion (Physical mode only)
 * Grounding Totem (Magical mode only)
 * Guardian of the Forgotten Queen
 * Ice Block

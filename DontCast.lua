@@ -232,6 +232,7 @@ local function defaultPhysicalAuras()
     1022,   -- Blessing of Protection
     118038, -- Die by the Sword
     210918, -- Ethereal Form
+    5277,   -- Evasion
     199754, -- Riposte
     236696, -- Thorns
   }
