@@ -252,14 +252,16 @@ local function isMagical()
   -- end up mattering as the auras assignment will get re-called when ACTIVE_TALENT_GROUP_CHANGED fires
   if GetSpecialization() == nil then return true end
 
-  local specId = GetSpecializationInfo(GetSpecialization())
-
   local casterIds = {[62] = true, [63] = true, [64] = true, [102] = true, [258] = true, [262] = true, [265] = true, [266] = true, [267] = true}
 
-  -- Does not include Mistwalker (270) since physical-related warnings would be more helpful during Way of the Crane
-  local healerIds = {[65] = true, [105] = true, [256] = true, [257] = true, [264] = true}
+  return casterIds[GetSpecializationInfo(GetSpecialization())]
+end
 
-  return casterIds[specId] or healerIds[specId]
+local function isHealer()
+  if GetSpecialization() == nil then return false end
+
+  local healerIds = {[65] = true, [105] = true, [256] = true, [257] = true, [264] = true, [270] = true}
+  return healerIds[GetSpecializationInfo(GetSpecialization())]
 end
 
 -- adds values from secondTable to firstTable
@@ -300,6 +302,9 @@ local function savedAuras()
   mergeTables(specAuras, DontCastAuras[BASE])
   if isMagical() then
     mergeTables(specAuras, DontCastAuras[MAGICAL])
+  elseif isHealer() then
+    mergeTables(specAuras, DontCastAuras[MAGICAL])
+    mergeTables(specAuras, DontCastAuras[PHYSICAL])
   else
     mergeTables(specAuras, DontCastAuras[PHYSICAL])
   end
