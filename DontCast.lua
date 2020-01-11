@@ -391,6 +391,7 @@ local function isValid(name)
 
   local localalizedSmokeBomb = GetSpellInfo(76577)
   local localalizedTouchOfKarma = GetSpellInfo(122470)
+  local localalizedThorns = GetSpellInfo(203728)
   if (name == localalizedSmokeBomb) then
     --only concerned with Smoke Bomb when player NOT also in smoke
     local targetInSmoke = unitInSmoke("target", localalizedSmokeBomb)
@@ -401,6 +402,13 @@ local function isValid(name)
     for i = 1, MAX_AURAS do
       local buffName = UnitBuff("target", i)
       if buffName == localalizedTouchOfKarma then return true end
+    end
+    return false
+  elseif (name == localalizedThorns) then
+    --only display the (damage) buff, not the (slow) debuff
+    for i = 1, MAX_AURAS do
+      local buffName = UnitBuff("target", i)
+      if buffName == localalizedThorns then return true end
     end
     return false
   end
