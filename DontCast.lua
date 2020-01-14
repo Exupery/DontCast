@@ -780,7 +780,7 @@ end
 local function eventHandler(self, event, unit, ...)
   if event == "UNIT_AURA" then
     auraUpdated(self, event, unit)
-  elseif event == "PLAYER_TARGET_CHANGED" then
+  elseif event == "PLAYER_TARGET_CHANGED" or event == "ZONE_CHANGED_NEW_AREA" then
     targetChanged(self, event, unit)
   elseif event == "PLAYER_REGEN_DISABLED" then
     lockFrame(false)
@@ -837,6 +837,7 @@ function loadDontCast(self, text, icon, cdText)
     eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
     eventFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
     eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
     eventFrame:SetScript("OnEvent", eventHandler)
     eventFrame:SetScript("OnUpdate", onUpdate)
 

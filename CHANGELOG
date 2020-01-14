@@ -4,6 +4,7 @@ DONTCAST CHANGE LOG
 v1.4.12
 - display both physical and magical auras for all healers
 - Thorns will now only display on the recipient of the damage-dealing buff, not the movement speed debuff
+- fixed bug where display could remain after zoning out of arena
 - updated for 8.3
 
 v1.4.11
