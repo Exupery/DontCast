@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.4.13
+- added Blur to default physical auras
+
 v1.4.12
 - display both physical and magical auras for all healers
 - Thorns will now only display on the recipient of the damage-dealing buff, not the movement speed debuff

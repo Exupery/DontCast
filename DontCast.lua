@@ -232,6 +232,7 @@ end
 local function defaultPhysicalAuras()
   return {
     1022,   -- Blessing of Protection
+    198589, -- Blur
     118038, -- Die by the Sword
     210918, -- Ethereal Form
     5277,   -- Evasion
