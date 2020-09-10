@@ -7,6 +7,7 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 * Aspect of the Turtle
 * Blessing of Protection (Physical mode only)
 * Blessing of Spellwarding (Magical mode only)
+* Blur (Physical mode only)
 * Cloak of Shadows (Magical mode only)
 * Cyclone
 * Dark Pact
@@ -17,6 +18,7 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 * Divine Shield
 * Ethereal Form (Physical mode only)
 * Evasion (Physical mode only)
+* Eye for an Eye (Physical mode only)
 * Grounding Totem (Magical mode only)
 * Guardian of the Forgotten Queen
 * Ice Block

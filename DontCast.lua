@@ -235,6 +235,7 @@ local function defaultPhysicalAuras()
     198589, -- Blur
     118038, -- Die by the Sword
     210918, -- Ethereal Form
+    205191, -- Eye for an Eye
     5277,   -- Evasion
     199754, -- Riposte
     236696, -- Thorns
