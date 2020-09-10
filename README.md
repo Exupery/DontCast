@@ -60,3 +60,4 @@ Prior to version 1.3.7 any auras added to the default list (e.g. Dispersion in v
 * integrate adding/removing auras via options UI
 * set expiring soon threshold to a provided spell's cast-time
 * add support for immunity effects not shown as aura on target player (e.g. Counterstrike Totem, Mass Spell Reflection)
+* add [Masque](https://www.curseforge.com/wow/addons/masque) support
