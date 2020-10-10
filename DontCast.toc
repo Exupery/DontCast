@@ -1,7 +1,7 @@
-## Interface: 80300
+## Interface: 90001
 ## Title: DontCast
 ## Notes: Warns when target is immune to damage
-## Author: Exupery - Emerald Dream
+## Author: Exuperjun - Emerald Dream
 ## Version: 1.4.13
 ## SavedVariables: DontCastAuras, DontCastConfig
 

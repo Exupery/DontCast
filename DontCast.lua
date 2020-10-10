@@ -428,10 +428,11 @@ local function auraUpdated(self, event, unit, ...)
   if unit == "target" and targetIsHostile() then
     local hasAura = false
     for i = 1, MAX_AURAS do
-      local name, icon = UnitBuff(unit, i)
+      local name, icon = UnitAura(unit, i, "HELPFUL")
       if not name then
-        name, icon = UnitDebuff(unit, i)
+        name, icon = UnitAura(unit, i, "HARMFUL")
       end
+      if not name then break end
       if name and isValid(name) and not hasAura then
         textFrame:SetText(name)
         iconFrame:SetTexture(icon)
