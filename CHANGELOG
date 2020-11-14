@@ -1,6 +1,10 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.4.14
+- copying another character's config now also copies size and location
+- changed default font to Arial
+
 v1.4.13
 - added Blur to default physical auras
 - added Eye for an Eye to default physical auras

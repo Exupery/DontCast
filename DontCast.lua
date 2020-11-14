@@ -16,6 +16,10 @@ local auras = {}
 local upAuras = {}
 local updCtr = 0
 
+local DEFAULT_POINT = "CENTER"
+local DEFAULT_WIDTH = 300
+local DEFAULT_HEIGHT = 50
+
 local BASE = "base"
 local MAGICAL = "magical"
 local PHYSICAL = "physical"
@@ -73,6 +77,35 @@ local function errorPrint(err)
   print("|cffff0000"..err)
 end
 
+local function updateConfig(key, value)
+  DontCastConfig[playerServer][key] = value
+  local updated = DontCastConfig[playerServer][key] == value
+  if updated then
+    config = DontCastConfig[playerServer]
+  end
+  return updated
+end
+
+local function movingOrSizingStopped()
+  local point, relativeTo, relativePoint, xOfs, yOfs = mainFrame:GetPoint(1)
+  local width = mainFrame:GetWidth()
+  local height = mainFrame:GetHeight()
+  updateConfig("point", point)
+  updateConfig("relativePoint", relativePoint)
+  updateConfig("xOfs", xOfs)
+  updateConfig("yOfs", yOfs)
+  updateConfig("width", width)
+  updateConfig("height", height)
+end
+
+local function resized(frame, width, height)
+  local font = textFrame:GetFont()
+  iconFrame:SetSize(height, height)
+  cdTextFrame:SetFont(font, height * 0.65)
+  textFrame:SetFont(font, height * 0.75)
+  textFrame:SetPoint("LEFT", height * 1.1, 0)
+end
+
 local function hideIfNotInConfig()
   if not mainFrame:IsMouseEnabled() then
     mainFrame:Hide()
@@ -103,16 +136,25 @@ end
 
 local function centerFrame()
   mainFrame:ClearAllPoints()
-  mainFrame:SetPoint("CENTER", UIParent, "CENTER")
+  mainFrame:SetPoint(DEFAULT_POINT, UIParent, DEFAULT_POINT)
+  mainFrame:SetSize(DEFAULT_WIDTH, DEFAULT_HEIGHT)
+  movingOrSizingStopped()
+  resized(mainFrame, DEFAULT_WIDTH, DEFAULT_HEIGHT)
 end
 
 local function defaultConfig()
   return {
     threshold = 1.5,
-    fontstyle = "Skurri",
+    fontstyle = "Arial",
     fontalignment = "Left",
     aurabeginsound = "",
-    auraendsound = ""
+    auraendsound = "",
+    point = DEFAULT_POINT,
+    relativePoint = DEFAULT_POINT,
+    xOfs = 0,
+    yOfs = 0,
+    width = DEFAULT_WIDTH,
+    height = DEFAULT_HEIGHT
   }
 end
 
@@ -150,6 +192,9 @@ local function savedConfig()
     end
   end
 
+  -- 1.4.14 saves location, calling movingOrSizingStopped() to
+  -- write those config variables before updating defaults
+  movingOrSizingStopped()
   -- if user upgrades to version that introduces new config vars set to default
   for k, v in pairs(defaultConfig()) do
     if DontCastConfig[playerServer][k] == nil then DontCastConfig[playerServer][k] = v end
@@ -162,15 +207,6 @@ local function savedConfig()
   swapConfigKeyValue("auraendsound", SOUNDS)
 
   return DontCastConfig[playerServer]
-end
-
-local function updateConfig(key, value)
-  DontCastConfig[playerServer][key] = value
-  local updated = DontCastConfig[playerServer][key] == value
-  if updated then
-    config = DontCastConfig[playerServer]
-  end
-  return updated
 end
 
 local function setFontStyle(style)
@@ -484,14 +520,6 @@ local function onUpdate(self, elapsed)
   end
 end
 
-local function resized(frame, width, height)
-  local font = textFrame:GetFont()
-  iconFrame:SetSize(height, height)
-  cdTextFrame:SetFont(font, height * 0.65)
-  textFrame:SetFont(font, height * 0.75)
-  textFrame:SetPoint("LEFT", height * 1.1, 0)
-end
-
 local function fontStyleSelected(self)
   setFontStyle(self.value)
   tempConfig.fontstyle = self.value
@@ -659,6 +687,11 @@ local function copyConfigSelected(self)
   setInputBoxText(optionsFrame.threshold, tempConfig.threshold)
   setFontStyle(tempConfig.fontstyle)
   setFontAlignment(tempConfig.fontalignment)
+  if tempConfig.point ~= nil then
+    mainFrame:ClearAllPoints()
+    mainFrame:SetPoint(tempConfig.point, UIParent, tempConfig.relativePoint, tempConfig.xOfs, tempConfig.yOfs)
+    mainFrame:SetSize(tempConfig.width, tempConfig.height)
+  end
   reloadDropDowns()
 end
 
@@ -707,6 +740,7 @@ local function saveOptions()
   setThreshold(optionsFrame.threshold:GetText(), false)
   updateConfig("fontstyle", getSelectedFontStyle())
   updateConfig("fontalignment", getSelectedFontAlignment())
+  movingOrSizingStopped()
 
   if tempConfig.aurabeginsound ~= nil then
     updateConfig("aurabeginsound", tempConfig.aurabeginsound)
@@ -719,6 +753,9 @@ end
 
 local function cancelOptions()
   resetTempConfig()
+  mainFrame:ClearAllPoints()
+  mainFrame:SetPoint(config.point, UIParent, config.relativePoint, config.xOfs, config.yOfs)
+  mainFrame:SetSize(config.width, config.height)
   setFontStyle(config.fontstyle)
   setFontAlignment(config.fontalignment)
   hideAndLockFrame()
@@ -814,7 +851,10 @@ function loadDontCast(self, text, icon, cdText)
     mainFrame:SetMovable(true)
     mainFrame:RegisterForDrag("LeftButton", "RightButton")
     mainFrame:SetScript("OnDragStart", mainFrame.StartMoving)
-    mainFrame:SetScript("OnDragStop", mainFrame.StopMovingOrSizing)
+    mainFrame:SetScript("OnDragStop", function()
+      mainFrame:StopMovingOrSizing()
+      movingOrSizingStopped()
+    end)
 
     mainFrame:SetResizable(true)
     mainFrame:SetMinResize(32, 16)
@@ -833,6 +873,7 @@ function loadDontCast(self, text, icon, cdText)
     end)
     resizeButton:SetScript("OnMouseUp", function()
       mainFrame:StopMovingOrSizing()
+      movingOrSizingStopped()
     end)
 
     local eventFrame = CreateFrame("Frame", "DontCastEventFrame", UIParent)
