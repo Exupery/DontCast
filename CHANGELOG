@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.4.16
+- fixed bug where an aura wouldn't properly display when there was a conflict between harmful and helpful aura indexes
+
 v1.4.15
 - updated for 9.0.2
 

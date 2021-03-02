@@ -460,26 +460,40 @@ local function targetIsHostile()
   return UnitIsEnemy("player", "target") or UnitCanAttack("player", "target")
 end
 
+local function setAura(name, icon)
+  if name and isValid(name) then
+    textFrame:SetText(name)
+    iconFrame:SetTexture(icon)
+    if not mainFrame:IsShown() and SOUNDS[config.aurabeginsound] ~= nil then
+      PlaySound(SOUNDS[config.aurabeginsound], "Master")
+    end
+    mainFrame:Show()
+    upAuras[name] = true
+    return true
+  end
+  return false
+end
+
+local function setAuras(unit, filter)
+  local hasAura = false
+  for i = 1, MAX_AURAS do
+    local name, icon = UnitAura(unit, i, filter)
+    if not name then break end
+    if not hasAura then
+      hasAura = setAura(name, icon)
+    end
+    if hasAura then break end
+  end
+  return hasAura
+end
+
 local function auraUpdated(self, event, unit, ...)
   if unit == "target" and targetIsHostile() then
-    local hasAura = false
-    for i = 1, MAX_AURAS do
-      local name, icon = UnitAura(unit, i, "HELPFUL")
-      if not name then
-        name, icon = UnitAura(unit, i, "HARMFUL")
-      end
-      if not name then break end
-      if name and isValid(name) and not hasAura then
-        textFrame:SetText(name)
-        iconFrame:SetTexture(icon)
-        if not mainFrame:IsShown() and SOUNDS[config.aurabeginsound] ~= nil then
-          PlaySound(SOUNDS[config.aurabeginsound], "Master")
-        end
-        mainFrame:Show()
-        hasAura = true
-        upAuras[name] = true
-      end
+    local hasAura = setAuras(unit, "HELPFUL")
+    if not hasAura then
+      hasAura = setAuras(unit, "HARMFUL")
     end
+
     if not hasAura then
       if next(upAuras) ~= nil then
         if SOUNDS[config.auraendsound] ~= nil then
