@@ -515,19 +515,23 @@ local function targetChanged(self, event, unit, ...)
   end
 end
 
+local function updateAuraTime(aura, unit, filter)
+  for i = 1, MAX_AURAS do
+    local name, _, _, _, _, expTime = UnitAura(unit, i, filter)
+    if name == aura and expTime ~= nil then
+      displayCountdown(expTime - GetTime())
+    end
+  end
+end
+
 local function onUpdate(self, elapsed)
   updCtr = updCtr + elapsed
   if updCtr > 0.1 and mainFrame:IsShown() then
     local aura = textFrame:GetText()
     if aura then
       for i = 1, MAX_AURAS do
-        local name, _, _, _, _, expTime = UnitBuff("target", i)
-        if not expTime then
-          name, _, _, _, _, expTime = UnitDebuff("target", i)
-        end
-        if name == aura and expTime ~= nil then
-          displayCountdown(expTime - GetTime())
-        end
+        updateAuraTime(aura, "target", "HELPFUL")
+        updateAuraTime(aura, "target", "HARMFUL")
       end
     end
     updCtr = 0
