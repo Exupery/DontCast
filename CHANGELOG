@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.4.19
+- fixed bug where addon could occasionally reset its position
+
 v1.4.18
 - fix duration text not always updating
 

@@ -2,7 +2,7 @@
 ## Title: DontCast
 ## Notes: Warns when target is immune to damage
 ## Author: Exuperjun - Emerald Dream
-## Version: 1.4.18
+## Version: 1.4.19
 ## SavedVariables: DontCastAuras, DontCastConfig
 
 Libs\LibStub\LibStub.lua

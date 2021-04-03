@@ -192,9 +192,6 @@ local function savedConfig()
     end
   end
 
-  -- 1.4.14 saves location, calling movingOrSizingStopped() to
-  -- write those config variables before updating defaults
-  movingOrSizingStopped()
   -- if user upgrades to version that introduces new config vars set to default
   for k, v in pairs(defaultConfig()) do
     if DontCastConfig[playerServer][k] == nil then DontCastConfig[playerServer][k] = v end
@@ -851,6 +848,7 @@ local function eventHandler(self, event, unit, ...)
     auras = savedAuras()
     addNewDefaults()
     config = savedConfig()
+    mainFrame:SetPoint(config.point, UIParent, config.relativePoint, config.xOfs, config.yOfs)
     updateSoundConfig()
     createOptionsPanel()
     setFontStyle(config.fontstyle)
