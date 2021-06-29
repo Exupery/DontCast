@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.4.20
+- updated for 9.1
+
 v1.4.19
 - fixed bug where addon could occasionally reset its position
 
