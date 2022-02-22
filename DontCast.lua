@@ -271,7 +271,7 @@ local function defaultPhysicalAuras()
     205191, -- Eye for an Eye
     5277,   -- Evasion
     199754, -- Riposte
-    236696, -- Thorns
+    305497, -- Thorns
   }
 end
 
@@ -349,6 +349,7 @@ local function savedAuras()
 end
 
 local function addAura(aura, listName)
+  if aura == nil then return end
   DontCastAuras[listName][aura] = true
   if DontCastAuras[listName][aura] then
     auras = savedAuras()
