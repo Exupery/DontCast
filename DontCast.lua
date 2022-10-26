@@ -874,8 +874,7 @@ function loadDontCast(self, text, icon, cdText)
     end)
 
     mainFrame:SetResizable(true)
-    mainFrame:SetMinResize(32, 16)
-    mainFrame:SetMaxResize(512, 256)
+    mainFrame:SetResizeBounds(32, 16, 512, 256)
     mainFrame:SetScript("OnSizeChanged", resized)
 
     resizeButton = CreateFrame("Button", "DontCastResizeFrame", mainFrame)

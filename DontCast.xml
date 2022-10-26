@@ -19,7 +19,6 @@
         </Texture>
         <FontString name="DontCastSpellText" font="Fonts\SKURRI.TTF" justifyH="LEFT" justifyV="MIDDLE" text="">
           <Color r="1" g="1" b="0.1" a="0.9" />
-          <RelDimension x="0.75" y="1.0"/>
           <Shadow>
             <Color r="0.1" g="0.1" b="0.1" a="0.9"/>
             <Offset x="2" y="-2"/>
@@ -35,7 +34,7 @@
         </FontString>
       </Layer>
       <Layer level="ARTWORK">
-        <Texture name="DontCastSpellIcon" urgency="5" file="Interface\ICONS\INV_Misc_QuestionMark">
+        <Texture name="DontCastSpellIcon" file="Interface\ICONS\INV_Misc_QuestionMark">
           <Size x="45" y="45"/>
           <Anchors>
             <Anchor point="LEFT">
