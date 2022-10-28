@@ -9,7 +9,7 @@ local resizeButton = nil
 
 local playerServer = nil
 local config = {}
-local tempConfig = {}
+local tempConfig = {} -- used to copy profile settings
 local profiles = {}
 local auras = {}
 
@@ -211,12 +211,16 @@ local function setFontStyle(style)
   if not font then return end
   cdTextFrame:SetFont(font, mainFrame:GetHeight() * 0.6)
   textFrame:SetFont(font, mainFrame:GetHeight() * 0.75)
+  updateConfig("fontstyle", style)
+  movingOrSizingStopped()
 end
 
 local function setFontAlignment(justification)
   local alignment = FONT_ALIGNMENTS[justification]
   if not alignment then return end
   textFrame:SetJustifyH(alignment)
+  updateConfig("fontalignment", alignment)
+  movingOrSizingStopped()
 end
 
 local function addAurasToList(list, values)
@@ -538,12 +542,10 @@ end
 
 local function fontStyleSelected(self)
   setFontStyle(self.value)
-  tempConfig.fontstyle = self.value
 end
 
 local function fontAlignmentSelected(self)
   setFontAlignment(self.value)
-  tempConfig.fontalignment = self.value
 end
 
 local function createButton(text, parent)
@@ -622,20 +624,38 @@ local function drawPositioningOptions(parent, xOffset, yOffset)
   centerButton:SetScript("PostClick", centerFrame)
 end
 
+local function setThreshold(threshold, echo)
+  local asNum = tonumber(threshold)
+  if type(asNum) == "number" then
+    local updated = updateConfig("threshold", asNum)
+    if updated then
+      if echo then colorPrint("Threshold set to "..threshold) end
+      setInputBoxText(optionsFrame.threshold, threshold)
+    else
+      errorPrint("Unable to set threshold to "..threshold)
+    end
+  elseif echo then
+    errorPrint("Threshold NOT changed! Must be set to a number.")
+  end
+end
+
 local function drawThresholdOptions(parent, xOffset, yOffset)
   local label = createLabel("Expiring soon threshold (seconds)", parent, xOffset, yOffset)
 
   parent.threshold = createInputBox("threshold", parent, config.threshold)
   parent.threshold:SetMaxLetters(4)
   parent.threshold:SetPoint("LEFT", label, "RIGHT", 10, 0)
+  parent.threshold:SetScript("OnTextChanged", function(self, userInput)
+    setThreshold(optionsFrame.threshold:GetText(), false)
+  end)
 end
 
 local function getSelectedFontStyle()
-  return tempConfig.fontstyle ~= nil and tempConfig.fontstyle or config.fontstyle
+  return config.fontstyle
 end
 
 local function getSelectedFontAlignment()
-  return tempConfig.fontalignment ~= nil and tempConfig.fontalignment or config.fontalignment
+  return config.fontalignment
 end
 
 local function drawFontStyleOptions(parent, xOffset, yOffset)
@@ -654,20 +674,20 @@ end
 
 local function beginSoundSelected(self)
   if SOUNDS[self.value] ~= nil then PlaySound(SOUNDS[self.value], "Master") end
-  tempConfig.aurabeginsound = self.value
+  config.aurabeginsound = self.value
 end
 
 local function endSoundSelected(self)
   if SOUNDS[self.value] ~= nil then PlaySound(SOUNDS[self.value], "Master") end
-  tempConfig.auraendsound = self.value
+  config.auraendsound = self.value
 end
 
 local function getSelectedBeginSound()
-  return tempConfig.aurabeginsound ~= nil and tempConfig.aurabeginsound or config.aurabeginsound
+  return config.aurabeginsound
 end
 
 local function getSelectedEndSound()
-  return tempConfig.auraendsound ~= nil and tempConfig.auraendsound or config.auraendsound
+  return config.auraendsound
 end
 
 local function drawSoundOptions(parent, xOffset, yOffset)
@@ -699,6 +719,7 @@ local function copyConfigSelected(self)
   if not profileToCopy then return end
   for k, v in pairs(profileToCopy) do
     tempConfig[k] = v
+    config[k] = v
   end
   setInputBoxText(optionsFrame.threshold, tempConfig.threshold)
   setFontStyle(tempConfig.fontstyle)
@@ -733,74 +754,11 @@ local function updateOptionsUI()
   reloadDropDowns()
 end
 
-local function setThreshold(threshold, echo)
-  local asNum = tonumber(threshold)
-  if type(asNum) == "number" then
-    local updated = updateConfig("threshold", asNum)
-    if updated then
-      if echo then colorPrint("Threshold set to "..threshold) end
-      setInputBoxText(optionsFrame.threshold, threshold)
-    else
-      errorPrint("Unable to set threshold to "..threshold)
-    end
-  elseif echo then
-    errorPrint("Threshold NOT changed! Must be set to a number.")
-  end
-end
-
-local function resetTempConfig()
-  tempConfig = {}
-end
-
-local function saveOptions()
-  setThreshold(optionsFrame.threshold:GetText(), false)
-  updateConfig("fontstyle", getSelectedFontStyle())
-  updateConfig("fontalignment", getSelectedFontAlignment())
-  movingOrSizingStopped()
-
-  if tempConfig.aurabeginsound ~= nil then
-    updateConfig("aurabeginsound", tempConfig.aurabeginsound)
-  end
-  if tempConfig.auraendsound ~= nil then
-    updateConfig("auraendsound", tempConfig.auraendsound)
-  end
-  resetTempConfig()
-end
-
-local function cancelOptions()
-  resetTempConfig()
-  mainFrame:ClearAllPoints()
-  mainFrame:SetPoint(config.point, UIParent, config.relativePoint, config.xOfs, config.yOfs)
-  mainFrame:SetSize(config.width, config.height)
-  setFontStyle(config.fontstyle)
-  setFontAlignment(config.fontalignment)
-  hideAndLockFrame()
-end
-
-local function defaultOptions()
-  DontCastAuras = defaultAuras()
-  auras = savedAuras()
-  config = defaultConfig()
-  DontCastConfig[playerServer] = config
-  setThreshold(config.threshold, false)
-  setFontStyle(config.fontstyle)
-  setFontAlignment(config.fontalignment)
-  centerFrame()
-  hideAndLockFrame()
-  InterfaceOptionsFrame:Hide()
-  resetTempConfig()
-  colorPrint("All DontCast options reset to default")
-end
-
 local function createOptionsPanel()
   local xOffset = 20
   optionsFrame = CreateFrame("Frame", "DontCastOptions", UIParent)
   optionsFrame.name = "DontCast"
   InterfaceOptions_AddCategory(optionsFrame)
-
-  optionsFrame.okay = saveOptions
-  optionsFrame.cancel = cancelOptions
-  optionsFrame.default = defaultOptions
 
   optionsFrame.title = optionsFrame:CreateFontString("DontCastOptionsTitle", "OVERLAY", "GameFontNormalLarge")
   optionsFrame.title:SetPoint("TOPLEFT", xOffset, -20)
@@ -953,8 +911,6 @@ SlashCmdList["DONTCAST"] = function(cmd)
       auras = savedAuras()
       colorPrint("DontCast reverted to default triggers")
     elseif string.match(cmd, "config%w*") then
-      -- call twice to workaround WoW bug where very first call opens wrong tab
-      InterfaceOptionsFrame_OpenToCategory("DontCast")
       InterfaceOptionsFrame_OpenToCategory("DontCast")
       updateOptionsUI() -- values may have been modified via slash commands
     else
