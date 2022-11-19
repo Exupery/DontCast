@@ -1,8 +1,8 @@
-## Interface: 100000
+## Interface: 100002
 ## Title: DontCast
 ## Notes: Warns when target is immune to damage
 ## Author: Exuperjun - Emerald Dream
-## Version: 1.4.26
+## Version: 1.4.27
 ## SavedVariables: DontCastAuras, DontCastConfig
 
 Libs\LibStub\LibStub.lua

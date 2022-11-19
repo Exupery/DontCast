@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.4.27
+- updated for 10.0.2
+
 v1.4.26
 - fixed bug where config changes made via GUI wouldn't persist
 
