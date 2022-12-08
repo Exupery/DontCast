@@ -28,6 +28,7 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 * Netherwalk
 * Paralysis
 * Polymorph
+* Rage of the Sleeper
 * Riposte (Physical mode only)
 * Shield of Vengeance
 * Smoke Bomb

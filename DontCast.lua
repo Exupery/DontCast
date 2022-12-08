@@ -245,6 +245,7 @@ local function defaultBaseAuras()
     196555, -- Netherwalk
     115078, -- Paralysis
     28272,  -- Polymorph
+    200851, -- Rage of the Sleeper
     184662, -- Shield of Vengeance
     76577,  -- Smoke Bomb
     263648, -- Soul Barrier
