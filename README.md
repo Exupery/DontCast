@@ -8,6 +8,7 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 * Blessing of Protection (Physical mode only)
 * Blessing of Spellwarding (Magical mode only)
 * Blur (Physical mode only)
+* Cheat Death
 * Cloak of Shadows (Magical mode only)
 * Cyclone
 * Dark Pact
