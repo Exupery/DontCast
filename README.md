@@ -37,6 +37,7 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 * Spell Reflection (Magical mode only)
 * Temporal Shield
 * Thorns (Physical mode only)
+* Time Stop
 * Tombstone
 * Touch of Karma
 

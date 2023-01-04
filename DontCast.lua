@@ -251,6 +251,7 @@ local function defaultBaseAuras()
     76577,  -- Smoke Bomb
     263648, -- Soul Barrier
     198111, -- Temporal Shield
+    378441, -- Time Stop
     219809, -- Tombstone
     122470, -- Touch of Karma
   }
