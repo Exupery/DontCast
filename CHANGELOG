@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.4.30
+- corrected Thorns ID used when checking buff/debuff
+
 v1.4.29
 - updated for 10.0.5
 
