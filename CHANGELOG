@@ -1,6 +1,10 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.4.31
+- include default magical auras for both Evoker specs
+- updated for 10.1
+
 v1.4.30
 - corrected Thorns ID used when checking buff/debuff
 - updated for 10.0.7

@@ -296,7 +296,7 @@ local function isMagical()
   -- end up mattering as the auras assignment will get re-called when ACTIVE_TALENT_GROUP_CHANGED fires
   if GetSpecialization() == nil then return true end
 
-  local casterIds = {[62] = true, [63] = true, [64] = true, [102] = true, [258] = true, [262] = true, [265] = true, [266] = true, [267] = true}
+  local casterIds = {[62] = true, [63] = true, [64] = true, [102] = true, [258] = true, [262] = true, [265] = true, [266] = true, [267] = true, [1467] = true}
 
   return casterIds[GetSpecializationInfo(GetSpecialization())]
 end
@@ -304,7 +304,7 @@ end
 local function isHealer()
   if GetSpecialization() == nil then return false end
 
-  local healerIds = {[65] = true, [105] = true, [256] = true, [257] = true, [264] = true, [270] = true}
+  local healerIds = {[65] = true, [105] = true, [256] = true, [257] = true, [264] = true, [270] = true, [1468] = true}
   return healerIds[GetSpecializationInfo(GetSpecialization())]
 end
 
