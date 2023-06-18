@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.4.32
+- added Burrow to default auras
+
 v1.4.31
 - include default magical auras for both Evoker specs
 - updated for 10.1

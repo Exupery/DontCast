@@ -233,6 +233,7 @@ end
 local function defaultBaseAuras()
   return {
     186265, -- Aspect of the Turtle
+    409293, -- Burrow
     31230,  -- Cheat Death
     33786,  -- Cyclone
     108416, -- Dark Pact
