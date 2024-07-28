@@ -762,7 +762,10 @@ local function createOptionsPanel()
   local xOffset = 20
   optionsFrame = CreateFrame("Frame", "DontCastOptions", UIParent)
   optionsFrame.name = "DontCast"
-  InterfaceOptions_AddCategory(optionsFrame)
+
+  local category, _ = Settings.RegisterCanvasLayoutCategory(optionsFrame, optionsFrame.name, optionsFrame.name)
+  category.ID = optionsFrame.name
+  Settings.RegisterAddOnCategory(category)
 
   optionsFrame.title = optionsFrame:CreateFontString("DontCastOptionsTitle", "OVERLAY", "GameFontNormalLarge")
   optionsFrame.title:SetPoint("TOPLEFT", xOffset, -20)
@@ -915,7 +918,7 @@ SlashCmdList["DONTCAST"] = function(cmd)
       auras = savedAuras()
       colorPrint("DontCast reverted to default triggers")
     elseif string.match(cmd, "config%w*") then
-      InterfaceOptionsFrame_OpenToCategory("DontCast")
+      Settings.OpenToCategory("DontCast")
       updateOptionsUI() -- values may have been modified via slash commands
     else
       colorPrint("DontCast commands:")
