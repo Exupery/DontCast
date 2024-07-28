@@ -56,6 +56,17 @@ local FONTS = {
   Morpheus = "Fonts\\MORPHEUS.ttf",
   Skurri = "Fonts\\skurri.ttf",
   Emblem = "Interface\\Addons\\Dontcast\\Fonts\\Emblem.ttf",
+  Avengeance = "Interface\\Addons\\Dontcast\\Fonts\\Avengeance.ttf",
+  BradleyGratis = "Interface\\Addons\\Dontcast\\Fonts\\BradleyGratis.ttf",
+  Brave = "Interface\\Addons\\Dontcast\\Fonts\\Brave.ttf",
+  ComebackHome = "Interface\\Addons\\Dontcast\\Fonts\\ComebackHome.ttf",
+  Danvers = "Interface\\Addons\\Dontcast\\Fonts\\Danvers.ttf",
+  Jedi = "Interface\\Addons\\Dontcast\\Fonts\\Jedi.ttf",
+  Marvelous = "Interface\\Addons\\Dontcast\\Fonts\\Marvelous.ttf",
+  Memoirs = "Interface\\Addons\\Dontcast\\Fonts\\Memoirs.ttf",
+  Rebellion = "Interface\\Addons\\Dontcast\\Fonts\\Rebellion.ttf",
+  Wakanda = "Interface\\Addons\\Dontcast\\Fonts\\Wakanda.ttf",
+  Walt = "Interface\\Addons\\Dontcast\\Fonts\\Walt.ttf",
   SfDiegoSans = "Interface\\Addons\\Dontcast\\Fonts\\SF Diego Sans.ttf",
   koKR = "Fonts\\2002.ttf",
   ruRU = "Fonts\\ARIALN.TTF",
@@ -822,6 +833,27 @@ local function eventHandler(self, event, unit, ...)
   end
 end
 
+function registerFonts()
+  local SharedMedia = LibStub("LibSharedMedia-3.0")
+  local fonts = {
+    "Avengeance",
+    "BradleyGratis",
+    "Brave",
+    "ComebackHome",
+    "Danvers",
+    "Emblem",
+    "Jedi",
+    "Marvelous",
+    "Memoirs",
+    "Rebellion",
+    "Wakanda",
+    "Walt"
+  }
+  for _, font in ipairs(fonts) do
+    SharedMedia:Register(SharedMedia.MediaType.FONT, font, "Interface\\Addons\\DontCast\\Fonts\\"..font..".ttf", SharedMedia.LOCALE_BIT_western)
+  end
+end
+
 function loadDontCast(self, text, icon, cdText)
   if self and text and icon and cdText then
     mainFrame = self
@@ -869,6 +901,7 @@ function loadDontCast(self, text, icon, cdText)
     eventFrame:SetScript("OnUpdate", onUpdate)
 
     lockFrame(true)
+    registerFonts()
     colorPrint("DontCast loaded, for help type /dontcast ?")
   else
     errorPrint("Unable to load DontCast!")
