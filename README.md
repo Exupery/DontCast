@@ -17,7 +17,6 @@ Warns a player when their current target has buffs or debuffs that eliminate (or
 * Diffuse Magic (Magical mode only)
 * Dispersion
 * Divine Shield
-* Ethereal Form (Physical mode only)
 * Evasion (Physical mode only)
 * Eye for an Eye (Physical mode only)
 * Grounding Totem (Magical mode only)

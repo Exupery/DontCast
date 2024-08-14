@@ -2,13 +2,14 @@
 ## Title: DontCast
 ## Notes: Warns when target is immune to damage
 ## Author: Exuperjun - Emerald Dream
-## Version: 1.4.38
+## Version: 1.4.39
 ## IconTexture: Interface\AddOns\DontCast\DontCast.tga
 ## SavedVariables: DontCastAuras, DontCastConfig
-## OptionalDeps: LibSharedMedia-3.0
 
 Libs\LibStub\LibStub.lua
 Libs\LibStub\LibRevision.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+Libs\LibSharedMedia-3.0\LibSharedMedia-3.0.lua
 Libs\AucSelectBox\AucSelectBox.xml
 DontCast.lua
 DontCast.xml

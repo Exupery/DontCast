@@ -112,8 +112,8 @@ end
 local function resized(frame, width, height)
   local font = textFrame:GetFont()
   iconFrame:SetSize(height, height)
-  cdTextFrame:SetFont(font, height * 0.65)
-  textFrame:SetFont(font, height * 0.75)
+  cdTextFrame:SetFont(font, height * 0.5)
+  textFrame:SetFont(font, height * 0.7)
   textFrame:SetPoint("LEFT", height * 1.1, 0)
 end
 
@@ -220,8 +220,8 @@ end
 local function setFontStyle(style)
   local font = FONTS[style]
   if not font then return end
-  cdTextFrame:SetFont(font, mainFrame:GetHeight() * 0.6)
-  textFrame:SetFont(font, mainFrame:GetHeight() * 0.75)
+  cdTextFrame:SetFont(font, mainFrame:GetHeight() * 0.5)
+  textFrame:SetFont(font, mainFrame:GetHeight() * 0.7)
   updateConfig("fontstyle", style)
   movingOrSizingStopped()
 end
@@ -236,8 +236,11 @@ end
 
 local function addAurasToList(list, values)
   for _, id in ipairs(values) do
-    local name = GetSpellInfo(id)
-    list[name] = true
+    local spellInfo = C_Spell.GetSpellInfo(id)
+    if spellInfo then
+      local name = spellInfo["name"]
+      list[name] = true
+    end
   end
 end
 
@@ -286,7 +289,6 @@ local function defaultPhysicalAuras()
     1022,   -- Blessing of Protection
     198589, -- Blur
     118038, -- Die by the Sword
-    210918, -- Ethereal Form
     205191, -- Eye for an Eye
     5277,   -- Evasion
     199754, -- Riposte
@@ -395,8 +397,12 @@ end
 local function addNewDefaults()
   for listName, list in pairs(defaultAuras()) do
     for _, auraId in pairs(list) do
-      local aura = GetSpellInfo(auraId)
-      if DontCastAuras[listName][aura] == nil then addAura(aura, listName) end
+      local spellInfo = C_Spell.GetSpellInfo(auraId)
+      if not spellInfo then
+        errorPrint("Invalid AuraID "..auraId)
+      elseif DontCastAuras[listName][spellInfo["name"]] == nil then
+        addAura(spellInfo["name"], listName)
+      end
     end
   end
 end
@@ -433,9 +439,12 @@ end
 
 local function unitInSmoke(unit, localalizedSmokeBomb)
   for i = 1, MAX_AURAS do
-    local name = UnitDebuff(unit, i)
-    if name == localalizedSmokeBomb then
-      return true
+    local spellInfo = C_UnitAuras.GetAuraDataByIndex(unit, i, "HARMFUL")
+    if spellInfo then
+      local name = spellInfo["name"]
+      if name == localalizedSmokeBomb then
+        return true
+      end
     end
   end
   return false
@@ -446,26 +455,35 @@ local function isValid(name)
     return false
   end
 
-  local localalizedSmokeBomb = GetSpellInfo(76577)
-  local localalizedTouchOfKarma = GetSpellInfo(122470)
-  local localalizedThorns = GetSpellInfo(305497)
+  local localalizedSmokeBomb = C_Spell.GetSpellInfo(76577)["name"]
+  local localalizedTouchOfKarma = C_Spell.GetSpellInfo(122470)["name"]
+  local localalizedThorns = C_Spell.GetSpellInfo(305497)["name"]
   if (name == localalizedSmokeBomb) then
     --only concerned with Smoke Bomb when player NOT also in smoke
     local targetInSmoke = unitInSmoke("target", localalizedSmokeBomb)
     local playerInSmoke = unitInSmoke("player", localalizedSmokeBomb)
-    return (targetInSmoke and not playerInSmoke) or (not targetInSmoke and playerInSmoke)
+    if (targetInSmoke and playerInSmoke) then
+      return false
+    end
+    return true
   elseif (name == localalizedTouchOfKarma) then
     --only display ToK if target has the buff, i.e. not recipients of the ToK dot debuff
     for i = 1, MAX_AURAS do
-      local buffName = UnitBuff("target", i)
-      if buffName == localalizedTouchOfKarma then return true end
+      local buffInfo = C_UnitAuras.GetBuffDataByIndex("target", i)
+      if buffInfo then
+        local buffName = buffInfo["name"]
+        if buffName == localalizedTouchOfKarma then return true end
+      end
     end
     return false
   elseif (name == localalizedThorns) then
     --only display the (damage) buff, not the (slow) debuff
     for i = 1, MAX_AURAS do
-      local buffName = UnitBuff("target", i)
-      if buffName == localalizedThorns then return true end
+      local buffInfo = C_UnitAuras.GetBuffDataByIndex("target", i)
+      if buffInfo then
+        local buffName = buffInfo["name"]
+        if buffName == localalizedThorns then return true end
+      end
     end
     return false
   end
@@ -494,12 +512,16 @@ end
 local function setAuras(unit, filter)
   local hasAura = false
   for i = 1, MAX_AURAS do
-    local name, icon = UnitAura(unit, i, filter)
-    if not name then break end
-    if not hasAura then
-      hasAura = setAura(name, icon)
+    local spellInfo = C_UnitAuras.GetAuraDataByIndex(unit, i, filter)
+    if spellInfo then
+      local name = spellInfo["name"]
+      local icon = spellInfo["icon"]
+      if not name then break end
+      if not hasAura then
+        hasAura = setAura(name, icon)
+      end
+      if hasAura then break end
     end
-    if hasAura then break end
   end
   return hasAura
 end
@@ -534,9 +556,13 @@ end
 
 local function updateAuraTime(aura, unit, filter)
   for i = 1, MAX_AURAS do
-    local name, _, _, _, _, expTime = UnitAura(unit, i, filter)
-    if name == aura and expTime ~= nil then
-      displayCountdown(expTime - GetTime())
+    local spellInfo = C_UnitAuras.GetAuraDataByIndex(unit, i, filter)
+    if spellInfo then
+      local name = spellInfo["name"]
+      local expTime = spellInfo["expirationTime"]
+      if name == aura and expTime ~= nil then
+        displayCountdown(expTime - GetTime())
+      end
     end
   end
 end
