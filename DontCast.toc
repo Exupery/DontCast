@@ -1,8 +1,8 @@
-## Interface: 110007
+## Interface: 110100
 ## Title: DontCast
 ## Notes: Warns when target is immune to damage
 ## Author: Exuperjun - Emerald Dream
-## Version: 1.4.41
+## Version: 1.4.42
 ## IconTexture: Interface\AddOns\DontCast\DontCast.tga
 ## SavedVariables: DontCastAuras, DontCastConfig
 

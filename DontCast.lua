@@ -928,7 +928,6 @@ function loadDontCast(self, text, icon, cdText)
 
     lockFrame(true)
     registerFonts()
-    colorPrint("DontCast loaded, for help type /dontcast ?")
   else
     errorPrint("Unable to load DontCast!")
   end
