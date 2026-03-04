@@ -2,7 +2,7 @@
 ## Title: DontCast
 ## Notes: Warns when target is immune to damage
 ## Author: Exuperjun - Emerald Dream
-## Version: 1.5
+## Version: 1.5.1
 ## IconTexture: Interface\AddOns\DontCast\DontCast.tga
 ## SavedVariables: DontCastAuras, DontCastConfig
 

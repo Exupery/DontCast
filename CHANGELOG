@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.5.1
+- resolved lua error due to using secret as table key
+
 v1.5
 - updated for Midnight
 

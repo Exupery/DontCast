@@ -12,7 +12,7 @@ local config = {}
 local tempConfig = {} -- used to copy profile settings
 local profiles = {}
 
-local upAuras = {}
+local upAuras = false
 
 local DEFAULT_POINT = "CENTER"
 local DEFAULT_WIDTH = 300
@@ -246,7 +246,7 @@ local function setAura(name, icon)
       PlaySound(SOUNDS[config.aurabeginsound], "Master")
     end
     mainFrame:Show()
-    upAuras[name] = true
+    upAuras = true
     return true
   end
   return false
@@ -262,11 +262,11 @@ local function auraUpdated(self, event, unit, ...)
     end
 
     if not hasAura then
-      if next(upAuras) ~= nil then
+      if upAuras then
         if SOUNDS[config.auraendsound] ~= nil then
           PlaySound(SOUNDS[config.auraendsound], "Master")
         end
-        upAuras = {}
+        upAuras = false
       end
       hideIfNotInConfig()
     end
@@ -274,7 +274,7 @@ local function auraUpdated(self, event, unit, ...)
 end
 
 local function targetChanged(self, event, unit, ...)
-  upAuras = {}
+  upAuras = false
   if targetIsHostile() then
     auraUpdated(self, event, "target")
   else
