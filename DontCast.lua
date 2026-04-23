@@ -4,7 +4,8 @@ local mainFrame = nil
 local textFrame = nil
 local iconFrame = nil
 local optionsFrame = nil
-local cdTextFrame = nil
+local optionsCategory = nil
+local cooldownFrame = nil
 local resizeButton = nil
 
 local playerServer = nil
@@ -101,11 +102,25 @@ local function movingOrSizingStopped()
   updateConfig("height", height)
 end
 
+local function updateCountFont(font, height)
+  if not DontCastCountFont then
+    CreateFont("DontCastCountFont")
+  end
+  DontCastCountFont:SetFont(font, height * 0.6, "OUTLINE")
+  DontCastCountFont:SetTextColor(1, 1, 0.1, 0.95)
+  DontCastCountFont:SetShadowColor(0.1, 0.1, 0.1, 0.9)
+  DontCastCountFont:SetShadowOffset(2, -2)
+  if cooldownFrame then
+    cooldownFrame:SetCountdownFont("DontCastCountFont")
+  end
+end
+
 local function resized(frame, width, height)
   local font = textFrame:GetFont()
   iconFrame:SetSize(height, height)
   textFrame:SetFont(font, height * 0.7)
   textFrame:SetPoint("LEFT", height * 1.1, 0)
+  updateCountFont(font, height)
 end
 
 local function hideIfNotInConfig()
@@ -116,7 +131,7 @@ end
 
 local function showAndUnlockFrame()
   textFrame:SetText("Click here to move")
-  cdTextFrame:SetText("")
+  cooldownFrame:Clear()
   iconFrame:SetTexture("Interface\\ICONS\\INV_Misc_QuestionMark")
   resizeButton:Show()
   mainFrame:Show()
@@ -211,6 +226,7 @@ local function setFontStyle(style)
   local font = FONTS[style]
   if not font then return end
   textFrame:SetFont(font, mainFrame:GetHeight() * 0.7)
+  updateCountFont(font, mainFrame:GetHeight())
   updateConfig("fontstyle", style)
   movingOrSizingStopped()
 end
@@ -238,10 +254,15 @@ local function targetIsHostile()
   return UnitIsEnemy("player", "target") or UnitCanAttack("player", "target")
 end
 
-local function setAura(name, icon)
+local function setAura(name, icon, durationSecret)
   if name then
     textFrame:SetText(name)
     iconFrame:SetTexture(icon)
+    if durationSecret then
+      cooldownFrame:SetCooldownFromDurationObject(durationSecret)
+    else
+      cooldownFrame:Clear()
+    end
     if not mainFrame:IsShown() and SOUNDS[config.aurabeginsound] ~= nil then
       PlaySound(SOUNDS[config.aurabeginsound], "Master")
     end
@@ -258,7 +279,9 @@ local function auraUpdated(self, event, unit, ...)
     local hasAura = false
     if #defensives > 0 then
       local first = defensives[1]
-      hasAura = setAura(first.name, first.icon)
+      local durationSecret = C_UnitAuras.GetAuraDuration and first.auraInstanceID
+        and C_UnitAuras.GetAuraDuration(unit, first.auraInstanceID)
+      hasAura = setAura(first.name, first.icon, durationSecret)
     end
 
     if not hasAura then
@@ -268,6 +291,7 @@ local function auraUpdated(self, event, unit, ...)
         end
         upAuras = false
       end
+      cooldownFrame:Clear()
       hideIfNotInConfig()
     end
   end
@@ -458,9 +482,8 @@ local function createOptionsPanel()
   optionsFrame = CreateFrame("Frame", "DontCastOptions", UIParent)
   optionsFrame.name = "DontCast"
 
-  local category, _ = Settings.RegisterCanvasLayoutCategory(optionsFrame, optionsFrame.name, optionsFrame.name)
-  category.ID = optionsFrame.name
-  Settings.RegisterAddOnCategory(category)
+  optionsCategory = Settings.RegisterCanvasLayoutCategory(optionsFrame, optionsFrame.name, optionsFrame.name)
+  Settings.RegisterAddOnCategory(optionsCategory)
 
   optionsFrame.title = optionsFrame:CreateFontString("DontCastOptionsTitle", "OVERLAY", "GameFontNormalLarge")
   optionsFrame.title:SetPoint("TOPLEFT", xOffset, -20)
@@ -533,12 +556,12 @@ function registerFonts()
   end
 end
 
-function loadDontCast(self, text, icon, cdText)
-  if self and text and icon and cdText then
+function loadDontCast(self, text, icon, cooldown)
+  if self and text and icon and cooldown then
     mainFrame = self
     textFrame = text
     iconFrame = icon
-    cdTextFrame = cdText
+    cooldownFrame = cooldown
 
     mainFrame:SetClampedToScreen(true)
     mainFrame:SetMovable(true)
@@ -593,7 +616,9 @@ SlashCmdList["DONTCAST"] = function(cmd)
     elseif cmd == "center" then
       centerFrame()
     elseif string.match(cmd, "config%w*") then
-      Settings.OpenToCategory("DontCast")
+      if optionsCategory then
+        Settings.OpenToCategory(optionsCategory:GetID())
+      end
       updateOptionsUI() -- values may have been modified via slash commands
     else
       colorPrint("DontCast commands:")
