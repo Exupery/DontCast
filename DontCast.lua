@@ -527,6 +527,7 @@ local function eventHandler(self, event, unit, ...)
   elseif event == "ADDON_LOADED" and unit == "DontCast" then
     playerServer = UnitName("player").." - "..GetRealmName()
     config = savedConfig()
+    mainFrame:ClearAllPoints()
     mainFrame:SetPoint(config.point, UIParent, config.relativePoint, config.xOfs, config.yOfs)
     updateSoundConfig()
     createOptionsPanel()

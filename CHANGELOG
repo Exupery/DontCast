@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.5.3
+- fix potential anchor family error
+
 v1.5.2
 - updated for 12.0.5
 - added back display of time remaining
