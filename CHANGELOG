@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.5.4
+- updated for 12.0.7
+
 v1.5.3
 - fix potential anchor family error
 
