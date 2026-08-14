@@ -1,6 +1,17 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.5.5
+- updated for 12.1.0
+- reworked aura tracking onto the new AuraContainer API; 12.1 made aura data
+  secret, so the old filter/read approach now raises a Lua error in combat
+- both major and external defensives are now shown, stacked up to two rows
+  (previously only the first match of either was displayed)
+- removed the aura begin/end sound options: addons can no longer detect an
+  aura appearing, and the replacement API only fires per specific spell ID
+- the frame now restores its saved size at login instead of reverting to the
+  default 300x50
+
 v1.5.4
 - updated for 12.0.7
 

@@ -4,7 +4,7 @@
     <Size x="300" y="50"/>
   <Scripts>
     <OnLoad>
-      loadDontCast(self, DontCastSpellText, DontCastSpellIcon, DontCastCooldown)
+      loadDontCast(self, DontCastSpellText, DontCastSpellIcon)
     </OnLoad>
   </Scripts>
   <Anchors>
@@ -12,12 +12,18 @@
     </Anchor>
   </Anchors>
 
+    <!--
+      The icon and text below are only the placeholder row shown while the frame is unlocked
+      for positioning. Real auras are drawn by the AuraContainer that DontCast.lua creates as a
+      child of this frame: since 12.1 the icon, spell name and countdown of an aura are all
+      written by the game onto AuraButtons it owns, and no addon can read them.
+    -->
     <Layers>
       <Layer level="ARTWORK">
         <Texture setAllPoints="true">
           <Color r="0.7" g="0.4" b="0.65" a="0" />
         </Texture>
-        <FontString name="DontCastSpellText" font="Fonts\SKURRI.TTF" justifyH="LEFT" justifyV="MIDDLE" text="">
+        <FontString name="DontCastSpellText" font="Fonts\SKURRI.TTF" justifyH="LEFT" justifyV="MIDDLE" text="" hidden="true">
           <Color r="1" g="1" b="0.1" a="0.9" />
           <Shadow>
             <Color r="0.1" g="0.1" b="0.1" a="0.9"/>
@@ -34,7 +40,7 @@
         </FontString>
       </Layer>
       <Layer level="ARTWORK">
-        <Texture name="DontCastSpellIcon" file="Interface\ICONS\INV_Misc_QuestionMark">
+        <Texture name="DontCastSpellIcon" file="Interface\ICONS\INV_Misc_QuestionMark" hidden="true">
           <Size x="45" y="45"/>
           <Anchors>
             <Anchor point="LEFT">
@@ -44,13 +50,5 @@
         </Texture>
       </Layer>
     </Layers>
-    <Frames>
-      <Cooldown name="DontCastCooldown" inherits="CooldownFrameTemplate" hideCountdownNumbers="false" reverse="true" drawEdge="false" drawSwipe="true">
-        <Anchors>
-          <Anchor point="TOPLEFT" relativeTo="DontCastSpellIcon" relativePoint="TOPLEFT"/>
-          <Anchor point="BOTTOMRIGHT" relativeTo="DontCastSpellIcon" relativePoint="BOTTOMRIGHT"/>
-        </Anchors>
-      </Cooldown>
-    </Frames>
   </Frame>
 </Ui>
