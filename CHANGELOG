@@ -5,6 +5,7 @@ v1.5.5
 - updated for 12.1.0
 - major defensives and external defensives can both be shown at the same time (previously only one would show if both were active at once)
 - optionally show for friendly players instead of only enemies (disabled by default, enable via the `/dontcast config` GUI)
+- optionally include showing CC (disabled by default, enable via the `/dontcast config` GUI)
 - removed the begin/end sound options (addons can no longer detect an
   aura appearing, and the replacement API only fires per specific spell ID)
 - fixed a bug where the frame size could revert to the default size

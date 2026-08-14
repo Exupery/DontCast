@@ -52,9 +52,14 @@ local COUNT_HEIGHT_RATIO = 0.6
 -- means an aura that is both is treated as the external: with only one slot per row, putting the
 -- overlap on the big row instead let a self defensive and an external-that-is-also-big compete
 -- for the same slot while the external row sat empty.
+-- Crowd control needs no such exclusion: it is HARMFUL where the defensives are HELPFUL, so it
+-- can never collide with them. `option` names the config key that switches a group on; a group
+-- without one is always on. Switching off is a budget of zero rather than a missing group,
+-- because groups cannot be added or removed after the container is built.
 local AURA_GROUPS = {
   { key = "bigdefensive", filter = "HELPFUL|BIG_DEFENSIVE|!EXTERNAL_DEFENSIVE" },
   { key = "externaldefensive", filter = "HELPFUL|EXTERNAL_DEFENSIVE" },
+  { key = "crowdcontrol", filter = "HARMFUL|CROWD_CONTROL", option = "showcc" },
 }
 
 local FONTS = {
@@ -182,6 +187,21 @@ local function buildGroupLayout()
   groupLayout.groupSpacing = 0
   groupLayout.groupLineSpacing = 0
   return groupLayout
+end
+
+-- One row per group, or none at all when the group's option is off.
+local function groupBudget(group)
+  if group.option and config[group.option] ~= true then return 0 end
+  return 1
+end
+
+local function applyGroupBudgets()
+  if not auraContainer then return end
+  for _, group in ipairs(AURA_GROUPS) do
+    if auraContainer:HasAuraGroup(group.key) then
+      auraContainer:SetAuraGroupMaxFrameCount(group.key, groupBudget(group))
+    end
+  end
 end
 
 local function applyGroupLayout()
@@ -368,6 +388,10 @@ local function refreshTarget()
     auraContainer:SetUnit("target")
   end
 
+  -- Applied on every refresh rather than only when the option changes, so the show below always
+  -- arms the current budgets and toggling a row needs no separate path of its own.
+  applyGroupBudgets()
+
   -- Hidden while there is nothing to track, which is what keeps a defensive popped with no
   -- target off the screen; shown otherwise, which is also what makes it pick up an aura that was
   -- already up before you targeted. See setContainerShown.
@@ -407,10 +431,10 @@ local function createAuraContainer()
   local sortMethod = AuraContainerSortMethod and AuraContainerSortMethod.BigDefensive
 
   for _, group in ipairs(AURA_GROUPS) do
-    -- One row per category: with maxFrameCount 1 the sort decides which aura wins the slot,
-    -- and BigDefensive is the engine's own ordering for exactly this kind of display.
+    -- One row per category: with a budget of 1 the sort decides which aura wins the slot, and
+    -- BigDefensive is the engine's own ordering for exactly this kind of display.
     frame:AddAuraGroup(group.key, group.filter, {
-      maxFrameCount = 1,
+      maxFrameCount = groupBudget(group),
       sortMethod = sortMethod,
       initializeFrame = initializeAuraButton,
       layout = buildGroupLayout(),
@@ -487,6 +511,7 @@ local function defaultConfig()
     fontstyle = "Arial",
     fontalignment = "Left",
     showfriendly = false,
+    showcc = false,
     point = DEFAULT_POINT,
     relativePoint = DEFAULT_POINT,
     xOfs = 0,
@@ -563,6 +588,13 @@ end
 local function setShowFriendly(enabled)
   updateConfig("showfriendly", enabled == true)
   -- The current target may now qualify (or stop qualifying) without the target itself changing.
+  refreshTarget()
+end
+
+local function setShowCC(enabled)
+  updateConfig("showcc", enabled == true)
+  -- refreshTarget re-applies the budgets and re-arms the container, so the row appears or
+  -- disappears on the spot rather than at the next target change.
   refreshTarget()
 end
 
@@ -667,14 +699,19 @@ end
 
 local function drawTargetOptions(parent, xOffset, yOffset)
   parent.showfriendly = createCheckBox("DontCastShowFriendly", parent,
-    "Also show for friendly targets", config.showfriendly, setShowFriendly)
+    "Show for friendly targets", config.showfriendly, setShowFriendly)
   parent.showfriendly:SetPoint("TOPLEFT", xOffset, yOffset)
+
+  parent.showcc = createCheckBox("DontCastShowCC", parent,
+    "Show crowd control", config.showcc, setShowCC)
+  parent.showcc:SetPoint("TOPLEFT", xOffset, yOffset - 30)
 end
 
 local function reloadOptions()
   optionsFrame.fontstyle:SetText(getSelectedFontStyle())
   optionsFrame.fontalignment:SetText(getSelectedFontAlignment())
   optionsFrame.showfriendly:SetChecked(config.showfriendly == true)
+  optionsFrame.showcc:SetChecked(config.showcc == true)
 end
 
 local function copyConfigSelected(self)
@@ -737,7 +774,7 @@ local function createOptionsPanel()
   drawPositioningOptions(optionsFrame, xOffset, -50)
   drawFontStyleOptions(optionsFrame, xOffset, -90)
   drawTargetOptions(optionsFrame, xOffset, -130)
-  drawCopyConfigOptions(optionsFrame, xOffset, -170)
+  drawCopyConfigOptions(optionsFrame, xOffset, -205)
 
   updateOptionsUI()
 end
