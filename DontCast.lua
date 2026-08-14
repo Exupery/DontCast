@@ -25,7 +25,6 @@ local containerBuilt = false
 local auraButtons = {}
 local restylePending = false
 local restyleTicker = nil
-local bounceScheduled = false
 -- True while the frame is unlocked for positioning; the container is parked on "none" so real
 -- auras can't draw over the placeholder row.
 local previewing = false
@@ -33,6 +32,9 @@ local previewing = false
 local DEFAULT_POINT = "CENTER"
 local DEFAULT_WIDTH = 300
 local DEFAULT_HEIGHT = 50
+
+-- The AuraContainer intrinsic's own default unit token, i.e. "track nobody".
+local PARKED_UNIT = "none"
 
 -- Row geometry, shared by the real aura rows and the unlock-mode placeholder so both look the
 -- same. All of it derives from the frame height, which is one row.
@@ -43,11 +45,16 @@ local COUNT_HEIGHT_RATIO = 0.6
 -- Filter tokens combine with AND, never OR, so "HELPFUL|BIG_DEFENSIVE|EXTERNAL_DEFENSIVE" would
 -- match only auras flagged as both - i.e. almost nothing. Two groups on one container is the
 -- idiom for OR: they lay out as one continuous column and an empty group collapses, so a lone
--- external defensive still renders on the first row. The negation keeps an aura flagged as both
--- out of the second group, so it is never drawn twice.
+-- external defensive still renders on the first row.
+--
+-- A spell can carry BOTH flags (Life Cocoon does), so one of the two groups has to exclude the
+-- overlap or the aura would be drawn on both rows. The exclusion sits on the BIG group, which
+-- means an aura that is both is treated as the external: with only one slot per row, putting the
+-- overlap on the big row instead let a self defensive and an external-that-is-also-big compete
+-- for the same slot while the external row sat empty.
 local AURA_GROUPS = {
-  { key = "bigdefensive", filter = "HELPFUL|BIG_DEFENSIVE" },
-  { key = "externaldefensive", filter = "HELPFUL|EXTERNAL_DEFENSIVE|!BIG_DEFENSIVE" },
+  { key = "bigdefensive", filter = "HELPFUL|BIG_DEFENSIVE|!EXTERNAL_DEFENSIVE" },
+  { key = "externaldefensive", filter = "HELPFUL|EXTERNAL_DEFENSIVE" },
 }
 
 local FONTS = {
@@ -128,9 +135,20 @@ local function currentAlignment()
   return FONT_ALIGNMENTS[alignment] or alignment or "LEFT"
 end
 
--- The spell-name font string of a row. The engine owns its text and shown state; the face,
--- size, colour and placement stay ours.
-local function styleAuraText(fontString, height)
+-- Places and styles the spell name of a row. The engine owns its text and shown state; the
+-- face, size, colour and placement stay ours.
+--
+-- The box is a full frame width wide but starts past the icon, so it runs about an icon's width
+-- past the frame's right edge. That is deliberate, and is how the pre-12.1 display read: bounding
+-- the text inside the frame instead costs a whole icon width of room, which is enough to
+-- ellipsise names as ordinary as "Unending Resolve" at the default size.
+local function styleAuraText(fontString, anchor, width, height)
+  fontString:ClearAllPoints()
+  fontString:SetPoint("LEFT", anchor, "LEFT", height * ICON_INSET_RATIO, 0)
+  fontString:SetSize(width, height)
+  -- A row is one line tall, so a name too long even for the overflow should be cut rather than
+  -- wrapped into a second line there is no room for.
+  fontString:SetWordWrap(false)
   fontString:SetFont(currentFont(), math.max(1, math.floor(height * TEXT_HEIGHT_RATIO)))
   fontString:SetJustifyH(currentAlignment())
   fontString:SetJustifyV("MIDDLE")
@@ -213,10 +231,7 @@ end
 local function applyButtonStyle(widgets, width, height)
   widgets.button:SetSize(width, height)
   widgets.icon:SetSize(height, height)
-  widgets.text:ClearAllPoints()
-  widgets.text:SetPoint("LEFT", widgets.button, "LEFT", height * ICON_INSET_RATIO, 0)
-  widgets.text:SetPoint("RIGHT", widgets.button, "RIGHT", 0, 0)
-  styleAuraText(widgets.text, height)
+  styleAuraText(widgets.text, widgets.button, width, height)
 end
 
 -- Re-applies size and font to every row the container has created. Refused while the buttons
@@ -279,7 +294,7 @@ local function initializeAuraButton(button)
   -- errors on a font string with no font. styleAuraText then puts the configured face on it -
   -- before the registration, for the same reason.
   local text = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-  styleAuraText(text, height)
+  styleAuraText(text, button, rowWidth(), height)
   button:SetSpellName(text)
 
   local widgets = { button = button, icon = icon, cooldown = cooldown, text = text }
@@ -288,19 +303,33 @@ local function initializeAuraButton(button)
   applyButtonStyle(widgets, rowWidth(), height)
 end
 
--- Config pushed from addon code (a new unit, a new layout) only marks the container dirty; it
--- cannot arm the secure-side pass that consumes those marks. Hiding and showing the container
--- is the one thing addon code can do that does: the intrinsic OnShow runs untainted and issues
--- a full refresh. Nothing renders between the two calls, and it is coalesced to once per frame
--- because a refresh calls several setters in a row.
-local function bounceContainer()
-  if bounceScheduled or not auraContainer then return end
-  bounceScheduled = true
+-- Visibility is the only lever this addon pulls on the container, and it does two jobs at once:
+-- a hidden container draws nothing, and showing one makes it re-parse (the intrinsic OnShow is
+-- what arms the pass that consumes SetUnit's dirty marks - addon code can only mark, never
+-- consume).
+--
+-- Deliberately NOT done with SetEnabled. Disabling is the documented way to park a container and
+-- it does clear the rows, but doing so stopped this display working entirely, and it stayed
+-- broken across two different bounce timings - so the enabled flag is left alone.
+--
+-- The show is always preceded by a hide and deferred a frame, so even a re-show of an already
+-- shown container is a real transition rather than a no-op.
+local containerShown = false
+local showScheduled = false
+
+local function setContainerShown(shown)
+  if not auraContainer then return end
+
+  containerShown = shown
+  auraContainer:Hide()
+
+  if not shown or showScheduled then return end
+  showScheduled = true
 
   C_Timer.After(0, function()
-    bounceScheduled = false
-    if auraContainer and auraContainer:IsShown() then
-      auraContainer:Hide()
+    showScheduled = false
+    -- Re-checked rather than captured: the target may have changed again while this was queued.
+    if auraContainer and containerShown then
       auraContainer:Show()
     end
   end)
@@ -310,19 +339,39 @@ local function targetIsHostile()
   return UnitIsEnemy("player", "target") or UnitCanAttack("player", "target")
 end
 
--- Points the container at the current target, or parks it. The park-and-repoint is not
--- redundant: when you switch from one enemy to another the token string is still "target", so
--- the container sees no change and would keep showing the previous target's auras.
+-- Enemies always, friendlies only when the option is on. The same two defensive groups apply
+-- either way - on a friendly target they answer "does my target already have a defensive up,
+-- and how long is left on it", which is the healer's version of the same question.
+--
+-- The friendly side is players only. The option exists to watch teammates, and without this
+-- every quest giver, vendor and city guard you happened to click would qualify. The enemy side
+-- deliberately is not restricted: it has always shown for hostile NPCs, and a boss or mob
+-- popping a major defensive is worth the same warning as a player doing it.
+local function shouldTrackTarget()
+  if not UnitExists("target") then return false end
+  if targetIsHostile() then return true end
+  return config.showfriendly == true and UnitIsPlayer("target") == true
+end
+
+-- Points the container at the current target, or parks it out of sight.
 local function refreshTarget()
   if not auraContainer then return end
 
-  auraContainer:SetUnit("none")
+  local track = not previewing and shouldTrackTarget()
 
-  if not previewing and targetIsHostile() then
+  -- Park first, every time. Switching from one target to another leaves the token string as
+  -- "target", and SetUnit early-outs when the string is unchanged, so the container would never
+  -- notice and would keep parsing the previous occupant's auras.
+  auraContainer:SetUnit(PARKED_UNIT)
+
+  if track then
     auraContainer:SetUnit("target")
   end
 
-  bounceContainer()
+  -- Hidden while there is nothing to track, which is what keeps a defensive popped with no
+  -- target off the screen; shown otherwise, which is also what makes it pick up an aura that was
+  -- already up before you targeted. See setContainerShown.
+  setContainerShown(track)
 end
 
 local function createAuraContainer()
@@ -345,7 +394,7 @@ local function createAuraContainer()
   frame:Hide()
   frame:SetSize(1, 1)
   frame:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 0, 0)
-  frame:SetUnit("none")
+  frame:SetUnit(PARKED_UNIT)
 
   -- Rows stack downward from the top-left of the frame, so a single aura occupies exactly the
   -- frame the user positioned and a second one hangs below it.
@@ -377,8 +426,9 @@ local function createAuraContainer()
   applyGroupLayout()
   restyleAuraButtons()
 
-  -- The groups exist now, so the container can be let out. This show is the arming refresh.
-  frame:Show()
+  -- The groups exist now, so the container can be let out. refreshTarget shows it on the next
+  -- frame, which is also the hidden-to-shown transition that arms the first parse - so the frame
+  -- is deliberately left hidden here rather than shown and immediately hidden again.
   refreshTarget()
 end
 
@@ -390,10 +440,7 @@ local function updatePreview()
   local height = rowHeight()
 
   previewIcon:SetSize(height, height)
-  previewText:ClearAllPoints()
-  previewText:SetPoint("LEFT", mainFrame, "LEFT", height * ICON_INSET_RATIO, 0)
-  previewText:SetPoint("RIGHT", mainFrame, "RIGHT", 0, 0)
-  styleAuraText(previewText, height)
+  styleAuraText(previewText, mainFrame, rowWidth(), height)
 end
 
 local function resized(frame, width, height)
@@ -439,6 +486,7 @@ local function defaultConfig()
   return {
     fontstyle = "Arial",
     fontalignment = "Left",
+    showfriendly = false,
     point = DEFAULT_POINT,
     relativePoint = DEFAULT_POINT,
     xOfs = 0,
@@ -512,6 +560,12 @@ local function setFontAlignment(justification)
   movingOrSizingStopped()
 end
 
+local function setShowFriendly(enabled)
+  updateConfig("showfriendly", enabled == true)
+  -- The current target may now qualify (or stop qualifying) without the target itself changing.
+  refreshTarget()
+end
+
 local function fontStyleSelected(self)
   setFontStyle(self.value)
 end
@@ -527,6 +581,25 @@ local function createButton(text, parent)
   button:SetText(text)
   button:ClearAllPoints()
   return button
+end
+
+local function createCheckBox(name, parent, label, checked, onClick)
+  local checkbox = CreateFrame("CheckButton", name, parent, "UICheckButtonTemplate")
+  checkbox:ClearAllPoints()
+  checkbox:SetChecked(checked == true)
+
+  -- The template names its label differently across versions, so take whichever it gave us.
+  local text = checkbox.text or checkbox.Text or _G[name.."Text"]
+  if text then
+    text:SetText(label)
+    text:SetPoint("LEFT", checkbox, "RIGHT", 4, 0)
+  end
+
+  checkbox:SetScript("OnClick", function(self)
+    onClick(self:GetChecked() == true)
+  end)
+
+  return checkbox
 end
 
 local function sortedKeys(tbl)
@@ -592,9 +665,16 @@ local function drawFontStyleOptions(parent, xOffset, yOffset)
   parent.fontalignment:SetPoint("LEFT", parent.fontstyle, "RIGHT", 60, 0)
 end
 
-local function reloadDropDowns()
+local function drawTargetOptions(parent, xOffset, yOffset)
+  parent.showfriendly = createCheckBox("DontCastShowFriendly", parent,
+    "Also show for friendly targets", config.showfriendly, setShowFriendly)
+  parent.showfriendly:SetPoint("TOPLEFT", xOffset, yOffset)
+end
+
+local function reloadOptions()
   optionsFrame.fontstyle:SetText(getSelectedFontStyle())
   optionsFrame.fontalignment:SetText(getSelectedFontAlignment())
+  optionsFrame.showfriendly:SetChecked(config.showfriendly == true)
 end
 
 local function copyConfigSelected(self)
@@ -607,13 +687,16 @@ local function copyConfigSelected(self)
   end
   setFontStyle(tempConfig.fontstyle)
   setFontAlignment(tempConfig.fontalignment)
+  -- The copied profile may disagree with this one about friendly targets, and the target itself
+  -- has not changed, so nothing else would pick that up.
+  refreshTarget()
   if tempConfig.point ~= nil then
     mainFrame:ClearAllPoints()
     mainFrame:SetPoint(tempConfig.point, UIParent, tempConfig.relativePoint, tempConfig.xOfs, tempConfig.yOfs)
     mainFrame:SetSize(tempConfig.width, tempConfig.height)
     resized(mainFrame)
   end
-  reloadDropDowns()
+  reloadOptions()
 end
 
 local function copyConfigEntries()
@@ -634,7 +717,7 @@ local function drawCopyConfigOptions(parent, xOffset, yOffset)
 end
 
 local function updateOptionsUI()
-  reloadDropDowns()
+  reloadOptions()
 end
 
 local function createOptionsPanel()
@@ -653,7 +736,8 @@ local function createOptionsPanel()
 
   drawPositioningOptions(optionsFrame, xOffset, -50)
   drawFontStyleOptions(optionsFrame, xOffset, -90)
-  drawCopyConfigOptions(optionsFrame, xOffset, -130)
+  drawTargetOptions(optionsFrame, xOffset, -130)
+  drawCopyConfigOptions(optionsFrame, xOffset, -170)
 
   updateOptionsUI()
 end
