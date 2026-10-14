@@ -1,6 +1,9 @@
 DONTCAST CHANGE LOG
 ===================
 
+v1.5.6
+- updated for 12.1.5
+
 v1.5.5
 - updated for 12.1.0
 - major defensives and external defensives can both be shown at the same time (previously only one would show if both were active at once)
